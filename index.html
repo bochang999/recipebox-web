@@ -28,20 +28,12 @@
                         <span class="menu-text">料理レシピ</span>
                     </button>
                     
-                    <button class="menu-button" onclick="showScreen('sauces-screen')">
-                        <span class="menu-text">タレ・調味料</span>
-                    </button>
-                    
                     <button class="menu-button" onclick="showScreen('containers-screen')">
                         <span class="menu-text">容器重量データ</span>
                     </button>
                     
                     <button class="menu-button" onclick="showScreen('salt-calc-screen')">
                         <span class="menu-text">塩分濃度計算機</span>
-                    </button>
-                    
-                    <button class="menu-button" onclick="showScreen('chocolate-screen')">
-                        <span class="menu-text">チョコレート</span>
                     </button>
                 </div>
             </main>
@@ -53,7 +45,7 @@
                 <button class="back-button" onclick="showScreen('main-screen')">← 戻る</button>
                 <h2>料理レシピ</h2>
                 <div class="header-actions">
-                    <button class="action-button" id="add-recipe-btn">＋追加</button>
+                    <!-- レシピ追加機能を削除 -->
                 </div>
             </header>
             
@@ -75,21 +67,11 @@
             </div>
         </div>
 
-        <!-- タレ・調味料画面 -->
-        <div id="sauces-screen" class="screen">
-            <header class="screen-header">
-                <button class="back-button" onclick="showScreen('main-screen')">← 戻る</button>
-                <h2>タレ・調味料</h2>
-            </header>
-            <div class="screen-content">
-                <p class="feature-coming-soon">タレ・調味料機能（実装予定）</p>
-            </div>
-        </div>
 
         <!-- 容器重量データ画面 -->
         <div id="containers-screen" class="screen">
             <header class="screen-header">
-                <button class="back-button" onclick="showScreen('main-screen')">← 戻る</button>
+                <button class="back-button" onclick="showScreen('main-screen')" style="position: fixed; bottom: 20px; right: 20px; z-index: 1000; background: #2196F3; color: white; border: none; border-radius: 50%; width: 60px; height: 60px; font-size: 18px; box-shadow: 0 4px 8px rgba(0,0,0,0.2);">↑</button>
                 <h2>容器重量データ</h2>
             </header>
             <div class="screen-content">
@@ -118,6 +100,26 @@
                         <span class="container-name">炊飯器釜</span>
                         <span class="container-weight">664g</span>
                     </div>
+                    <div class="container-item">
+                        <span class="container-name">小さな鍋</span>
+                        <span class="container-weight">-</span>
+                    </div>
+                    <div class="container-item">
+                        <span class="container-name">大きな鍋</span>
+                        <span class="container-weight">-</span>
+                    </div>
+                    <div class="container-item">
+                        <span class="container-name">レンジパスタケース</span>
+                        <span class="container-weight">80g</span>
+                    </div>
+                    <div class="container-item">
+                        <span class="container-name">プラビーカー</span>
+                        <span class="container-weight">32g</span>
+                    </div>
+                    <div class="container-item">
+                        <span class="container-name">牛乳紙パック</span>
+                        <span class="container-weight">38g</span>
+                    </div>
                 </div>
             </div>
         </div>
@@ -125,7 +127,7 @@
         <!-- 塩分濃度計算機画面 -->
         <div id="salt-calc-screen" class="screen">
             <header class="screen-header">
-                <button class="back-button" onclick="showScreen('main-screen')">← 戻る</button>
+                <button class="back-button" onclick="showScreen('main-screen')" style="position: fixed; bottom: 20px; right: 20px; z-index: 1000; background: #2196F3; color: white; border: none; border-radius: 50%; width: 60px; height: 60px; font-size: 18px; box-shadow: 0 4px 8px rgba(0,0,0,0.2);">↑</button>
                 <h2>塩分濃度計算機</h2>
             </header>
             <div class="screen-content">
@@ -172,25 +174,47 @@
                         <span class="reference-name">つけ麺</span>
                         <span class="reference-value">2.8%</span>
                     </div>
+                    <div class="reference-item">
+                        <span class="reference-name">冷やし中華（100ml）</span>
+                        <span class="reference-value">1.7-1.8%</span>
+                    </div>
+                    <div class="reference-item">
+                        <span class="reference-name">つけつゆ（100ml）</span>
+                        <span class="reference-value">3.4-3.6%</span>
+                    </div>
+                </div>
+                
+                <div class="reference-table">
+                    <h3>その他の目安</h3>
+                    <div class="reference-item">
+                        <span class="reference-name">赤缶カレー粉（1人前）</span>
+                        <span class="reference-value">小さじ1弱</span>
+                    </div>
+                    <div class="reference-item">
+                        <span class="reference-name">塩ダレ（1人前）</span>
+                        <span class="reference-value">大さじ1 + 水200ml</span>
+                    </div>
+                    <div class="reference-item">
+                        <span class="reference-name">塩ダレ（2人前）</span>
+                        <span class="reference-value">大さじ1</span>
+                    </div>
+                    <div class="reference-item">
+                        <span class="reference-name">塩ダレ（半人前）</span>
+                        <span class="reference-value">水100ml</span>
+                    </div>
+                    <div class="reference-item">
+                        <span class="reference-name">コーントルティーヤ</span>
+                        <span class="reference-value">50g/1枚</span>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <!-- チョコレート画面 -->
-        <div id="chocolate-screen" class="screen">
-            <header class="screen-header">
-                <button class="back-button" onclick="showScreen('main-screen')">← 戻る</button>
-                <h2>チョコレート</h2>
-            </header>
-            <div class="screen-content">
-                <p class="feature-coming-soon">チョコレート機能（実装予定）</p>
-            </div>
-        </div>
 
         <!-- レシピ詳細画面 -->
         <div id="recipe-detail-screen" class="screen">
             <header class="screen-header">
-                <button class="back-button" onclick="showScreen('recipes-screen')">← 戻る</button>
+                <button class="back-button" onclick="showScreen('recipes-screen')" style="position: fixed; bottom: 20px; right: 20px; z-index: 1000; background: #2196F3; color: white; border: none; border-radius: 50%; width: 60px; height: 60px; font-size: 18px; box-shadow: 0 4px 8px rgba(0,0,0,0.2);">↑</button>
                 <h2 id="recipe-detail-title">レシピ詳細</h2>
                 <div class="header-actions">
                     <button class="action-button" id="edit-recipe-btn">編集</button>
@@ -249,10 +273,10 @@
             </div>
         </div>
 
-        <!-- レシピ追加・編集画面 -->
-        <div id="recipe-form-screen" class="screen">
+        <!-- レシピ追加・編集画面（非表示） -->
+        <div id="recipe-form-screen" class="screen" style="display: none;">
             <header class="screen-header">
-                <button class="back-button" onclick="showScreen('recipes-screen')">← 戻る</button>
+                <button class="back-button" onclick="showScreen('recipes-screen')" style="position: fixed; bottom: 20px; right: 20px; z-index: 1000; background: #2196F3; color: white; border: none; border-radius: 50%; width: 60px; height: 60px; font-size: 18px; box-shadow: 0 4px 8px rgba(0,0,0,0.2);">↑</button>
                 <h2 id="recipe-form-title">レシピ追加</h2>
                 <div class="header-actions">
                     <button class="action-button" id="save-recipe-btn">保存</button>
