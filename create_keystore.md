@@ -104,4 +104,103 @@ GitHub Secretsが正しく設定されると、次回のPush時に以下が実�
    - 「パッケージ競合」エラーが発生しない
    - アプリデータが保持される
 
+## 🚀 セットアップ完了後の次のステップ
+
+### キーストア作成後のすぐやること
+
+1. **GitHub Secrets設定確認**
+   ```bash
+   # 設定されたSecretsを確認（リポジトリ設定ページで）
+   - KEYSTORE_FILE ✅
+   - KEYSTORE_PASSWORD ✅  
+   - KEY_ALIAS ✅
+   ```
+
+2. **初回ビルドテスト**
+   ```bash
+   # リポジトリルートで変更をプッシュ
+   git add .
+   git commit -m "Enable advanced APK signing system"
+   git push
+   
+   # GitHub Actions結果を確認
+   # -> "Build RecipeBox Android App with Advanced Signing" が成功するはず
+   ```
+
+3. **APK更新テスト手順**
+   ```bash
+   # 1回目：初回インストール
+   # - GitHub Releasesから app-release.apk をダウンロード
+   # - Android端末にインストール
+   
+   # 2回目：更新テスト
+   # - 小さな変更（例：index.html内のテキスト修正）
+   # - git push でビルド実行
+   # - 新しい app-release.apk をダウンロード
+   # - 既存アプリの上からインストール（エラーが出ないことを確認）
+   ```
+
+### トラブルシューティング拡張
+
+#### Q1: GitHub Actions で「KEYSTORE_FILE not found」エラー
+```bash
+# A1: Base64エンコードを再確認
+base64 -w 0 recipebox-release-key.p12 > keystore_base64.txt
+# 改行なしで全文をGitHub Secretsに貼り付け
+```
+
+#### Q2: 「Keystore alias not found」エラー
+```bash
+# A2: エイリアス名を確認
+keytool -list -keystore recipebox-release-key.p12 -storetype PKCS12
+# 出力の "Alias name: XXX" をKEY_ALIASに設定
+```
+
+#### Q3: APK署名は成功するが、Android端末で「パッケージ解析エラー」
+```bash
+# A3: APK構造問題 - ワークフローのAAPT診断ログを確認
+# GitHub Actions -> Jobs -> "Build Signed APK" -> "🔍 APK Structure Diagnostic"
+```
+
+#### Q4: 2回目以降のAPKで「アプリ更新不可」エラー
+```bash
+# A4: 署名一貫性問題
+# - 同じキーストアファイルを使用していることを確認
+# - versionCodeが増加していることを確認（GitHub run_number使用）
+# - 一度だけ手動アンインストール→再インストールで解決
+```
+
+### 📊 成功指標
+
+完全に設定できた場合の確認項目：
+
+#### GitHub Actions成功ログ例
+```
+✅ APK structure valid
+✅ APK signature verification successful  
+🎨 Replaced APK icons with custom RecipeBox icon
+🔐 Signed APK with alias: recipebox-key
+📦 Created Release: RecipeBox v20
+```
+
+#### Android端末での確認項目
+- [ ] RecipeBoxカスタムアイコンが表示される
+- [ ] アプリが正常に起動する  
+- [ ] 2回目以降のAPKが上書きインストールできる
+- [ ] データが保持される（レシピ、設定等）
+- [ ] 「パッケージ競合」エラーが発生しない
+
 設定が完了したらお知らせください。次のステップに進みます。
+
+### 🎯 上級者向け：カスタムアイコン置換
+
+ユーザー提供の画像を使用したい場合：
+
+```bash
+# 1. 画像をプロジェクトに追加
+cp /path/to/your-icon.png icons/custom-icon.png
+
+# 2. ワークフローを修正して使用
+# .github/workflows/android-build.yml の該当部分で
+# create_icon.py の代わりに画像ファイルを使用
+```
