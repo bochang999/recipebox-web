@@ -81,19 +81,25 @@ jobs:
           KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
           KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
           KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+          VERSION_CODE: ${{ github.run_number }}
         run: |
           chmod +x gradlew
           if [ "$KEYSTORE_EXISTS" = "true" ]; then
-            echo "Building signed release APK..."
+            echo "Building signed release APK with versionCode=${VERSION_CODE}..."
             ./gradlew assembleRelease \
               -Pandroid.injected.signing.store.file=app/keystore.jks \
               -Pandroid.injected.signing.store.password="$KEYSTORE_PASSWORD" \
               -Pandroid.injected.signing.key.alias="$KEY_ALIAS" \
               -Pandroid.injected.signing.key.password="$KEY_PASSWORD" \
+              -Pandroid.injected.version.code="$VERSION_CODE" \
+              -Pandroid.injected.version.name="1.$(printf '%02d' $VERSION_CODE)" \
               --no-daemon --stacktrace
           else
-            echo "No keystore found, building debug APK..."
-            ./gradlew assembleDebug --no-daemon --stacktrace
+            echo "No keystore found, building debug APK with versionCode=${VERSION_CODE}..."
+            ./gradlew assembleDebug \
+              -Pandroid.injected.version.code="$VERSION_CODE" \
+              -Pandroid.injected.version.name="1.$(printf '%02d' $VERSION_CODE)" \
+              --no-daemon --stacktrace
           fi
 
       - name: Rename APK for Release
