@@ -1,0 +1,20 @@
+{
+  "name": "recipebox-web",
+  "version": "1.0.0",
+  "description": "## 概要 分量調整と塩分濃度計算ができるシンプルな料理レシピ管理Webアプリ",
+  "main": "script.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@capacitor/android": "^7.4.2",
+    "@capacitor/core": "^7.4.2",
+    "sharp": "^0.34.3"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "^7.4.2"
+  }
+}

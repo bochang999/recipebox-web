@@ -1,0 +1,585 @@
+/* リセットCSS */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background-color: #f5f5f5;
+    color: #333;
+    line-height: 1.6;
+}
+
+/* アプリ全体のコンテナ */
+#app {
+    max-width: 480px;
+    margin: 0 auto;
+    background: white;
+    min-height: 100vh;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+
+/* 画面切り替え */
+.screen {
+    display: none;
+    height: 100vh;
+    overflow-y: auto;
+}
+
+.screen.active {
+    display: flex;
+    flex-direction: column;
+}
+
+/* メイン画面のヘッダー */
+.app-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    text-align: center;
+    padding: 40px 20px 30px;
+}
+
+.app-title {
+    font-size: 28px;
+    font-weight: 700;
+    margin-bottom: 8px;
+}
+
+.app-subtitle {
+    font-size: 16px;
+    opacity: 0.9;
+}
+
+/* メニューコンテナ */
+.menu-container {
+    flex: 1;
+    padding: 30px 20px;
+}
+
+.menu-grid {
+    display: grid;
+    gap: 20px;
+    max-width: 300px;
+    margin: 0 auto;
+}
+
+.menu-button {
+    display: flex;
+    align-items: center;
+    background: white;
+    border: 2px solid #e0e0e0;
+    border-radius: 12px;
+    padding: 20px;
+    font-size: 18px;
+    font-weight: 500;
+    color: #333;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.menu-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    border-color: #2196F3;
+}
+
+.menu-button:active {
+    transform: translateY(0);
+}
+
+.menu-icon {
+    font-size: 24px;
+    margin-right: 15px;
+}
+
+.menu-text {
+    flex: 1;
+}
+
+/* 各画面のヘッダー */
+.screen-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 15px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.back-button {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 6px;
+    transition: background 0.2s;
+}
+
+.back-button:hover {
+    background: rgba(255,255,255,0.1);
+}
+
+.screen-header h2 {
+    font-size: 20px;
+    font-weight: 600;
+    flex: 1;
+    text-align: center;
+    margin: 0 10px;
+}
+
+.header-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.action-button {
+    background: rgba(255,255,255,0.2);
+    border: 1px solid rgba(255,255,255,0.3);
+    color: white;
+    padding: 8px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background 0.2s;
+}
+
+.action-button:hover {
+    background: rgba(255,255,255,0.3);
+}
+
+/* 画面コンテンツ */
+.screen-content {
+    flex: 1;
+    padding: 20px;
+    overflow-y: auto;
+}
+
+/* 検索バー */
+.search-container {
+    margin-bottom: 20px;
+}
+
+.search-input {
+    width: 100%;
+    padding: 12px 16px;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    font-size: 16px;
+    transition: border-color 0.2s;
+}
+
+.search-input:focus {
+    outline: none;
+    border-color: #2196F3;
+}
+
+/* ソートタブ */
+.sort-tabs {
+    display: flex;
+    margin-bottom: 20px;
+    background: #f0f0f0;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.sort-tab {
+    flex: 1;
+    padding: 10px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.2s;
+}
+
+.sort-tab.active {
+    background: #2196F3;
+    color: white;
+}
+
+.sort-tab:hover:not(.active) {
+    background: rgba(33, 150, 243, 0.1);
+}
+
+/* 容器リスト */
+.container-list {
+    display: grid;
+    gap: 12px;
+}
+
+.container-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: white;
+    padding: 16px;
+    border-radius: 8px;
+    border: 1px solid #e0e0e0;
+}
+
+.container-name {
+    font-weight: 500;
+}
+
+.container-weight {
+    font-weight: 600;
+    color: #2196F3;
+}
+
+/* 計算機 */
+.calc-container {
+    background: white;
+    padding: 20px;
+    border-radius: 12px;
+    border: 1px solid #e0e0e0;
+    margin-bottom: 20px;
+}
+
+.calc-input-group {
+    margin-bottom: 15px;
+}
+
+.calc-input-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 500;
+    color: #555;
+}
+
+.calc-input-group input {
+    width: 100%;
+    padding: 12px;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    font-size: 16px;
+}
+
+.calc-input-group input:focus {
+    outline: none;
+    border-color: #2196F3;
+}
+
+.calc-button {
+    width: 100%;
+    background: #2196F3;
+    color: white;
+    border: none;
+    padding: 15px;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.calc-button:hover {
+    background: #1976D2;
+}
+
+.calc-result {
+    margin-top: 15px;
+    padding: 15px;
+    background: #f0f8ff;
+    border-radius: 8px;
+    border: 1px solid #2196F3;
+    font-size: 18px;
+    font-weight: 600;
+    text-align: center;
+    color: #2196F3;
+    display: none;
+}
+
+.calc-result.show {
+    display: block;
+}
+
+/* 参考表 */
+.reference-table {
+    background: white;
+    border-radius: 12px;
+    border: 1px solid #e0e0e0;
+    overflow: hidden;
+}
+
+.reference-table h3 {
+    background: #f8f9fa;
+    padding: 15px 20px;
+    margin: 0;
+    font-size: 16px;
+    font-weight: 600;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.reference-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 20px;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.reference-item:last-child {
+    border-bottom: none;
+}
+
+.reference-name {
+    font-weight: 500;
+}
+
+.reference-value {
+    font-weight: 600;
+    color: #2196F3;
+    font-size: 16px;
+}
+
+/* 空メッセージ */
+.empty-message, .feature-coming-soon {
+    text-align: center;
+    color: #666;
+    padding: 40px 20px;
+    font-size: 16px;
+}
+
+.feature-coming-soon {
+    background: #f8f9fa;
+    border-radius: 8px;
+    border: 1px solid #e0e0e0;
+}
+
+/* レスポンシブ対応 */
+@media (max-width: 480px) {
+    #app {
+        box-shadow: none;
+    }
+    
+    .menu-container {
+        padding: 20px 15px;
+    }
+    
+    .screen-content {
+        padding: 15px;
+    }
+}
+
+/* PWAのための調整 */
+@media (display-mode: standalone) {
+    .app-header {
+        padding-top: 60px; /* ステータスバー分の余白 */
+    }
+}
+
+/* タップ時のハイライト除去 */
+button, .menu-button {
+    -webkit-tap-highlight-color: transparent;
+}
+
+/* レシピ詳細画面のスタイル */
+.portion-adjustment {
+    background: white;
+    border-radius: 12px;
+    border: 1px solid #e0e0e0;
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+.portion-adjustment h3 {
+    margin: 0 0 15px 0;
+    color: #333;
+    font-size: 18px;
+}
+
+.portion-slider-container {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.portion-slider-container label {
+    font-weight: 500;
+    color: #555;
+}
+
+#portion-value {
+    color: #2196F3;
+    font-weight: 600;
+}
+
+.portion-slider {
+    width: 100%;
+    height: 8px;
+    border-radius: 4px;
+    background: #e0e0e0;
+    outline: none;
+    -webkit-appearance: none;
+}
+
+.portion-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: #2196F3;
+    cursor: pointer;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.portion-markers {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    color: #666;
+    padding: 0 12px;
+}
+
+/* 材料・手順セクション */
+.ingredients-section, .steps-section, .version-history {
+    background: white;
+    border-radius: 12px;
+    border: 1px solid #e0e0e0;
+    margin-bottom: 20px;
+}
+
+.ingredients-section h3, .steps-section h3, .version-history h3 {
+    background: #f8f9fa;
+    margin: 0;
+    padding: 15px 20px;
+    font-size: 18px;
+    font-weight: 600;
+    border-bottom: 1px solid #e0e0e0;
+    border-radius: 12px 12px 0 0;
+}
+
+.ingredients-list, .steps-list, .version-list {
+    padding: 20px;
+}
+
+.ingredient-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 0;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.ingredient-item:last-child {
+    border-bottom: none;
+}
+
+.ingredient-name {
+    font-weight: 500;
+    flex: 1;
+}
+
+.ingredient-amount {
+    font-weight: 600;
+    color: #2196F3;
+    margin-left: 10px;
+}
+
+.ingredient-note {
+    font-size: 12px;
+    color: #666;
+    margin-left: 5px;
+}
+
+.step-item {
+    display: flex;
+    margin-bottom: 15px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.step-item:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+    padding-bottom: 0;
+}
+
+.step-number {
+    background: #2196F3;
+    color: white;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    font-weight: 600;
+    margin-right: 15px;
+    flex-shrink: 0;
+    margin-top: 2px;
+}
+
+.step-text {
+    flex: 1;
+    line-height: 1.6;
+}
+
+/* 追加情報 */
+.additional-info {
+    margin-bottom: 20px;
+}
+
+.info-grid {
+    display: grid;
+    gap: 10px;
+}
+
+.info-item {
+    background: white;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 12px 16px;
+    font-size: 14px;
+    color: #555;
+}
+
+.info-item:empty {
+    display: none;
+}
+
+.info-label {
+    font-weight: 600;
+    color: #333;
+    margin-right: 8px;
+}
+
+/* バージョン履歴 */
+.version-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 0;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.version-item:last-child {
+    border-bottom: none;
+}
+
+.version-info {
+    flex: 1;
+}
+
+.version-number {
+    font-weight: 600;
+    color: #2196F3;
+}
+
+.version-date {
+    font-size: 12px;
+    color: #666;
+    margin-left: 10px;
+}
+
+.version-changes {
+    font-size: 14px;
+    color: #555;
+    margin-top: 4px;
+}
