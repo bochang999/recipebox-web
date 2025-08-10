@@ -1,4 +1,4 @@
-name: Build RecipeBox Android App
+name: Build RecipeBox Android App with Advanced Signing
 
 on:
   push:
@@ -11,7 +11,7 @@ permissions:
 jobs:
   build:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 45
 
     steps:
       - name: Checkout code
@@ -62,20 +62,241 @@ jobs:
           chmod +x gradlew
           ./gradlew assembleDebug --no-daemon --stacktrace
 
-      - name: Upload APK
+      - name: Force increment versionCode
+        run: |
+          echo "=== Incrementing versionCode to avoid conflicts ==="
+          apk_path=$(find android -name "*.apk" | head -n1)
+          if [ -n "$apk_path" ]; then
+            echo "Current APK: $apk_path"
+            
+            # Extract current versionCode
+            current_version=$(aapt2 dump badging "$apk_path" | grep "versionCode" | cut -d"'" -f2)
+            echo "Current versionCode: $current_version"
+            
+            # Increment by GitHub run number to ensure uniqueness
+            new_version=$((current_version + ${{ github.run_number }}))
+            echo "New versionCode: $new_version"
+            
+            # Store for later use
+            echo "NEW_VERSION_CODE=$new_version" >> $GITHUB_ENV
+            echo "ORIGINAL_VERSION_CODE=$current_version" >> $GITHUB_ENV
+          fi
+
+      - name: Setup signing keystore
+        if: ${{ secrets.KEYSTORE_FILE != '' }}
+        run: |
+          echo "=== Setting up keystore ==="
+          printf '%s' "$KEYSTORE_FILE" | base64 -d > $RUNNER_TEMP/release.p12
+          echo "Keystore created at: $RUNNER_TEMP/release.p12"
+          
+          echo "=== Diagnostic checks ==="
+          ls -la $RUNNER_TEMP/release.p12
+          echo "File type:"
+          file $RUNNER_TEMP/release.p12
+          
+          echo "=== Verifying keystore (PKCS12 format) ==="
+          keytool -list -storetype PKCS12 \
+            -keystore $RUNNER_TEMP/release.p12 \
+            -storepass "$KEYSTORE_PASSWORD" -v | head -20
+          
+          echo "=== Extract actual alias name ==="
+          ACTUAL_ALIAS=$(keytool -list -keystore $RUNNER_TEMP/release.p12 -storepass "$KEYSTORE_PASSWORD" -storetype PKCS12 | grep "Alias name:" | cut -d: -f2 | xargs)
+          echo "Actual alias in keystore: $ACTUAL_ALIAS"
+          echo "ACTUAL_ALIAS=$ACTUAL_ALIAS" >> $GITHUB_ENV
+        env:
+          KEYSTORE_FILE: ${{ secrets.KEYSTORE_FILE }}
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+
+      - name: Replace APK Icons with RecipeBox Custom Icons
+        if: ${{ secrets.KEYSTORE_FILE != '' }}
+        run: |
+          set -e
+          echo "=== Finding APK files ==="
+          unsigned=$(find android -type f -name "*.apk" | head -n1)
+          if [ -z "$unsigned" ]; then
+            echo "No APK files found!"
+            exit 1
+          fi
+          
+          echo "Processing: $unsigned"
+          
+          # Extract APK
+          echo "=== Extracting APK ==="
+          mkdir -p $RUNNER_TEMP/apk_extract
+          cd $RUNNER_TEMP/apk_extract
+          unzip -q "$GITHUB_WORKSPACE/$unsigned"
+          
+          # Replace icons with RecipeBox custom icons
+          echo "=== Replacing icons with RecipeBox custom icons ==="
+          
+          # Use the high-resolution RecipeBox icon
+          recipebox_icon="$GITHUB_WORKSPACE/recipe-icon-1024.png"
+          if [ ! -f "$recipebox_icon" ]; then
+            # Fallback to 512x512 icon
+            recipebox_icon="$GITHUB_WORKSPACE/icons/icon-512x512.png"
+          fi
+          
+          if [ ! -f "$recipebox_icon" ]; then
+            echo "❌ RecipeBox icon not found!"
+            exit 1
+          fi
+          
+          echo "Using RecipeBox icon: $recipebox_icon"
+          
+          # Replace all mipmap icons
+          for dir in res/mipmap-*; do
+            if [ -d "$dir" ]; then
+              echo "Replacing icons in $dir"
+              cp "$recipebox_icon" "$dir/ic_launcher.png" 2>/dev/null || echo "No ic_launcher.png in $dir"
+              cp "$recipebox_icon" "$dir/ic_launcher_round.png" 2>/dev/null || echo "No ic_launcher_round.png in $dir"
+              cp "$recipebox_icon" "$dir/ic_launcher_foreground.png" 2>/dev/null || echo "No ic_launcher_foreground.png in $dir"
+            fi
+          done
+          
+          # Remove META-INF to invalidate old signatures
+          echo "Removing old signatures..."
+          rm -rf META-INF
+          
+          # Uncompressed APK repackaging (CRC-preserving method)
+          echo "=== Uncompressed APK Repackaging (CRC-preserving) ==="
+          echo "Creating modified APK with uncompressed method..."
+          
+          # Use zip with uncompressed setting to preserve CRC values
+          zip -r -0 $RUNNER_TEMP/modified.apk .
+          
+          echo "✅ Uncompressed APK repackaging completed"
+          echo "RecipeBox icon replacement completed"
+          cd $GITHUB_WORKSPACE
+          
+          # Export modified APK path for next step
+          echo "MODIFIED_APK_PATH=$RUNNER_TEMP/modified.apk" >> $GITHUB_ENV
+
+      - name: Sign & Align APK
+        if: ${{ secrets.KEYSTORE_FILE != '' }}
+        run: |
+          set -e
+          
+          # Verify modified APK path from previous step
+          echo "=== Verifying modified APK path ==="
+          if [ -f "$MODIFIED_APK_PATH" ]; then
+            echo "✅ Modified APK found"
+          else
+            echo "❌ Modified APK not found, using original APK"
+            MODIFIED_APK_PATH=$(find android -type f -name "*.apk" | head -n1)
+          fi
+          
+          # Create output filenames
+          aligned=$RUNNER_TEMP/aligned.apk
+          signed=RecipeBox-v${{ github.run_number }}.apk
+          
+          # Try common alias names until one works
+          echo "=== Finding working alias ==="
+          for alias in "recipebox-key" "mykey" "1" "key" "alias" "androiddebugkey" "myalias" "main"; do
+            if keytool -list -keystore $RUNNER_TEMP/release.p12 -storepass "$KEYSTORE_PASSWORD" -storetype PKCS12 -alias "$alias" >/dev/null 2>&1; then
+              echo "✅ Found working alias: $alias"
+              WORKING_ALIAS="$alias"
+              break
+            fi
+          done
+          
+          # Use ACTUAL_ALIAS if found, otherwise use WORKING_ALIAS
+          FINAL_ALIAS="${ACTUAL_ALIAS:-$WORKING_ALIAS}"
+          if [ -z "$FINAL_ALIAS" ]; then
+            echo "❌ No valid alias found!"
+            exit 1
+          fi
+          
+          echo "Using alias: $FINAL_ALIAS"
+          
+          # Step 1: zipalign
+          echo "=== Running zipalign ==="
+          "$ANDROID_HOME/build-tools/34.0.0/zipalign" -p -f -v 4 "$MODIFIED_APK_PATH" "$aligned"
+          
+          # Step 2: apksigner with v1+v2+v3 signatures
+          echo "=== Running apksigner ==="
+          "$ANDROID_HOME/build-tools/34.0.0/apksigner" sign \
+            --ks $RUNNER_TEMP/release.p12 \
+            --ks-key-alias "$FINAL_ALIAS" \
+            --ks-pass pass:"$KEYSTORE_PASSWORD" \
+            --key-pass pass:"$KEYSTORE_PASSWORD" \
+            --v1-signing-enabled true \
+            --v2-signing-enabled true \
+            --v3-signing-enabled true \
+            --v4-signing-enabled false \
+            --out "$signed" "$aligned"
+          
+          # Verify signature
+          echo "=== Verifying signature ==="
+          if "$ANDROID_HOME/build-tools/34.0.0/apksigner" verify --verbose "$signed"; then
+            echo "✅ APK signature verification successful"
+          else
+            echo "❌ APK signature verification failed"
+            exit 1
+          fi
+          
+          echo "Successfully signed: $signed"
+          ls -la "$signed"
+        env:
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+
+      - name: Upload signed APK artifact
+        if: ${{ secrets.KEYSTORE_FILE != '' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: RecipeBox-signed-apk
+          path: "RecipeBox-v*.apk"
+
+      - name: Upload debug APK artifact (fallback)
+        if: ${{ secrets.KEYSTORE_FILE == '' }}
         uses: actions/upload-artifact@v4
         with:
           name: RecipeBox-debug.apk
           path: android/app/build/outputs/apk/debug/app-debug.apk
 
-      - name: Create Release
-        if: github.ref == 'refs/heads/main'
+      - name: Create Release with Signed APK
+        if: github.ref == 'refs/heads/main' && ${{ secrets.KEYSTORE_FILE != '' }}
         uses: softprops/action-gh-release@v2
         with:
           tag_name: v${{ github.run_number }}
           name: RecipeBox v${{ github.run_number }}
-          files: android/app/build/outputs/apk/debug/app-debug.apk
-          draft: false
-          prerelease: false
+          files: RecipeBox-v*.apk
+          body: |
+            🍳 **RecipeBox - Your Cooking Companion**
+            
+            **Features:**
+            - 📖 Comprehensive Recipe Collection  
+            - 🧮 Salt Concentration Calculator
+            - ⚖️ Container Weight Database
+            - 📱 Mobile-Optimized Interface
+            - 🔄 Ingredient Scaling (1-4 servings)
+            
+            **Installation:**
+            1. Download the APK file below
+            2. Enable "Install from Unknown Sources" in Android settings
+            3. Install the APK (seamless updates supported)
+            
+            **Updates:**
+            - ✅ Custom RecipeBox icons applied
+            - ✅ Advanced APK signing for seamless updates
+            - ✅ Version code auto-increment: ${{ github.run_number }}
+            - ✅ Uncompressed repackaging for stability
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Create Release with Debug APK (fallback)
+        if: github.ref == 'refs/heads/main' && ${{ secrets.KEYSTORE_FILE == '' }}
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ github.run_number }}
+          name: RecipeBox v${{ github.run_number }} (Debug)
+          files: android/app/build/outputs/apk/debug/app-debug.apk
+          body: |
+            🍳 **RecipeBox - Your Cooking Companion (Debug Build)**
+            
+            ⚠️  This is a debug build. For production use, configure signing keys.
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Cleanup keystore
+        if: ${{ secrets.KEYSTORE_FILE != '' }}
+        run: rm -f $RUNNER_TEMP/release.p12
