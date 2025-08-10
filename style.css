@@ -154,6 +154,7 @@ body {
 .screen-content {
     flex: 1;
     padding: 20px;
+    padding-bottom: 100px; /* 右下の戻るボタンとの重複回避 */
     overflow-y: auto;
 }
 
