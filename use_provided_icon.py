@@ -22,7 +22,7 @@ def generate_all_icons_from_source():
     """提供された画像から全サイズのアイコンを生成"""
     
     # 提供されたアイコンファイルのパス
-    source_icon = '/storage/emulated/0/Pictures/file_00000000907c622fb7a7a0ace3d078a9.png'
+    source_icon = '/storage/emulated/0/Pictures/recipe.png'
     
     # 各Android密度のサイズ設定
     sizes = [
