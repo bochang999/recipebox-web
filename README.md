@@ -63,4 +63,4 @@ cd android
 - レシピ追加・編集機能
 - アイコン作成
 - UI最適化
-- 自動デプロイ設定
+- 自動デプロイ設定# Test commit to trigger build
