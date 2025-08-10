@@ -83,7 +83,7 @@ jobs:
           fi
 
       - name: Setup signing keystore
-        if: secrets.KEYSTORE_FILE != ''
+        if: secrets.KEYSTORE_FILE
         run: |
           echo "=== Setting up keystore ==="
           printf '%s' "$KEYSTORE_FILE" | base64 -d > $RUNNER_TEMP/release.p12
@@ -108,7 +108,7 @@ jobs:
           KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
 
       - name: Replace APK Icons with RecipeBox Custom Icons
-        if: secrets.KEYSTORE_FILE != ''
+        if: secrets.KEYSTORE_FILE
         run: |
           set -e
           echo "=== Finding APK files ==="
@@ -172,7 +172,7 @@ jobs:
           echo "MODIFIED_APK_PATH=$RUNNER_TEMP/modified.apk" >> $GITHUB_ENV
 
       - name: Sign & Align APK
-        if: secrets.KEYSTORE_FILE != ''
+        if: secrets.KEYSTORE_FILE
         run: |
           set -e
           
@@ -240,21 +240,21 @@ jobs:
           KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
 
       - name: Upload signed APK artifact
-        if: secrets.KEYSTORE_FILE != ''
+        if: secrets.KEYSTORE_FILE
         uses: actions/upload-artifact@v4
         with:
           name: RecipeBox-signed-apk
           path: "RecipeBox-v*.apk"
 
       - name: Upload debug APK artifact (fallback)
-        if: secrets.KEYSTORE_FILE == ''
+        if: ${{ !secrets.KEYSTORE_FILE }}
         uses: actions/upload-artifact@v4
         with:
           name: RecipeBox-debug.apk
           path: android/app/build/outputs/apk/debug/app-debug.apk
 
       - name: Create Release with Signed APK
-        if: github.ref == 'refs/heads/main' && secrets.KEYSTORE_FILE != ''
+        if: github.ref == 'refs/heads/main' && secrets.KEYSTORE_FILE
         uses: softprops/action-gh-release@v2
         with:
           tag_name: v${{ github.run_number }}
@@ -284,7 +284,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Create Release with Debug APK (fallback)
-        if: github.ref == 'refs/heads/main' && secrets.KEYSTORE_FILE == ''
+        if: github.ref == 'refs/heads/main' && !secrets.KEYSTORE_FILE
         uses: softprops/action-gh-release@v2
         with:
           tag_name: v${{ github.run_number }}
@@ -298,5 +298,5 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Cleanup keystore
-        if: secrets.KEYSTORE_FILE != ''
+        if: secrets.KEYSTORE_FILE
         run: rm -f $RUNNER_TEMP/release.p12
