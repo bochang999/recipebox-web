@@ -56,17 +56,42 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-gradle-
 
-      - name: Build Android APK
+      - name: Decode Keystore
+        if: ${{ env.KEYSTORE_FILE != '' }}
+        env:
+          KEYSTORE_FILE: ${{ secrets.KEYSTORE_FILE }}
+        run: |
+          echo "$KEYSTORE_FILE" | base64 --decode > android/keystore.jks
+          echo "KEYSTORE_EXISTS=true" >> $GITHUB_ENV
+        
+      - name: Build Signed Android APK
         working-directory: android
+        env:
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
         run: |
           chmod +x gradlew
-          ./gradlew assembleDebug --no-daemon --stacktrace
+          if [ "$KEYSTORE_EXISTS" = "true" ]; then
+            echo "Building signed release APK..."
+            ./gradlew assembleRelease \
+              -Pandroid.injected.signing.store.file=keystore.jks \
+              -Pandroid.injected.signing.store.password="$KEYSTORE_PASSWORD" \
+              -Pandroid.injected.signing.key.alias="$KEY_ALIAS" \
+              -Pandroid.injected.signing.key.password="$KEY_PASSWORD" \
+              --no-daemon --stacktrace
+          else
+            echo "No keystore found, building debug APK..."
+            ./gradlew assembleDebug --no-daemon --stacktrace
+          fi
 
-      - name: Upload Debug APK
+      - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: RecipeBox-debug.apk
-          path: android/app/build/outputs/apk/debug/app-debug.apk
+          name: RecipeBox.apk
+          path: |
+            android/app/build/outputs/apk/release/app-release.apk
+            android/app/build/outputs/apk/debug/app-debug.apk
 
       - name: Create Release
         if: github.ref == 'refs/heads/main'
@@ -74,7 +99,9 @@ jobs:
         with:
           tag_name: v${{ github.run_number }}
           name: RecipeBox v${{ github.run_number }}
-          files: android/app/build/outputs/apk/debug/app-debug.apk
+          files: |
+            android/app/build/outputs/apk/release/app-release.apk
+            android/app/build/outputs/apk/debug/app-debug.apk
           body: |
             🍳 **RecipeBox v${{ github.run_number }} - Your Cooking Companion**
             
@@ -95,6 +122,12 @@ jobs:
             - Version Code: ${{ github.run_number }}
             - Build: ${{ github.sha }}
             
-            **Note:** This is a debug build. Advanced signing system will be added once keystore is configured.
+            **APK Downloads:**
+            - `app-release.apk`: Signed release version (recommended)
+            - `app-debug.apk`: Debug version (fallback)
+            
+            **Installation:**
+            - Use the signed release APK for consistent updates
+            - No more manual uninstall required!
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
