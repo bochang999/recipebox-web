@@ -46,8 +46,8 @@ jobs:
       - name: Install Pillow for Icon Generation
         run: pip install Pillow
 
-      - name: Generate Recipe Icons
-        run: python3 generate_recipe_icon.py
+      - name: Generate Recipe Icons from Provided Image
+        run: python3 use_provided_icon.py
 
       - name: Sync Capacitor
         run: npx cap sync android
@@ -98,29 +98,41 @@ jobs:
 
       - name: Rename APK for Release
         run: |
+          # 版本号计算: v1.01, v1.02, v1.03 等
+          MAJOR_VERSION=1
+          MINOR_VERSION=$(printf "%02d" ${{ github.run_number }})
+          VERSION="v${MAJOR_VERSION}.${MINOR_VERSION}"
+          
           if [ "$KEYSTORE_EXISTS" = "true" ] && [ -f android/app/build/outputs/apk/release/app-release.apk ]; then
-            cp android/app/build/outputs/apk/release/app-release.apk "RecipeBox-v${{ github.run_number }}.apk"
-            echo "APK_FILE=RecipeBox-v${{ github.run_number }}.apk" >> $GITHUB_ENV
+            cp android/app/build/outputs/apk/release/app-release.apk "RecipeBox-${VERSION}.apk"
+            echo "APK_FILE=RecipeBox-${VERSION}.apk" >> $GITHUB_ENV
+            echo "VERSION=${VERSION}" >> $GITHUB_ENV
           else
-            cp android/app/build/outputs/apk/debug/app-debug.apk "RecipeBox-v${{ github.run_number }}.apk"
-            echo "APK_FILE=RecipeBox-v${{ github.run_number }}.apk" >> $GITHUB_ENV
+            cp android/app/build/outputs/apk/debug/app-debug.apk "RecipeBox-${VERSION}.apk"
+            echo "APK_FILE=RecipeBox-${VERSION}.apk" >> $GITHUB_ENV
+            echo "VERSION=${VERSION}" >> $GITHUB_ENV
           fi
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: RecipeBox-v${{ github.run_number }}.apk
-          path: RecipeBox-v${{ github.run_number }}.apk
+          name: ${{ env.APK_FILE }}
+          path: ${{ env.APK_FILE }}
 
       - name: Create Release
         if: github.ref == 'refs/heads/main'
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: v${{ github.run_number }}
-          name: RecipeBox v${{ github.run_number }}
-          files: RecipeBox-v${{ github.run_number }}.apk
+          tag_name: ${{ env.VERSION }}
+          name: RecipeBox ${{ env.VERSION }}
+          files: ${{ env.APK_FILE }}
           body: |
-            🍳 **RecipeBox v${{ github.run_number }} - Your Cooking Companion**
+            🍳 **RecipeBox ${{ env.VERSION }} - Your Cooking Companion**
+            
+            **New in this version:**
+            - 🎨 Beautiful new recipe book icon
+            - 🔐 Consistent APK signing (no more uninstall required!)
+            - 📱 Enhanced mobile interface
             
             **Features:**
             - 📖 Comprehensive Recipe Collection (50+ recipes)
@@ -133,18 +145,14 @@ jobs:
             **Installation:**
             1. Download the APK file below
             2. Enable "Install from Unknown Sources" in Android settings  
-            3. Install the APK
+            3. Install the APK (updates work seamlessly!)
             
             **Version Info:**
-            - Version Code: ${{ github.run_number }}
+            - Version: ${{ env.VERSION }}
             - Build: ${{ github.sha }}
+            - Release APK with consistent signing
             
-            **APK Downloads:**
-            - `RecipeBox-v${{ github.run_number }}.apk`: Main application (recommended)
-            - Fallback APK also available if needed
-            
-            **Installation:**
-            - Use the signed release APK for consistent updates
-            - No more manual uninstall required!
+            **APK Download:**
+            - `${{ env.APK_FILE }}`: Main application with beautiful custom icon
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
