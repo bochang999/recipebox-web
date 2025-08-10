@@ -43,6 +43,12 @@ jobs:
       - name: Accept Android licenses
         run: yes | sdkmanager --licenses >/dev/null
 
+      - name: Install Pillow for Icon Generation
+        run: pip install Pillow
+
+      - name: Generate Recipe Icons
+        run: python3 generate_recipe_icon.py
+
       - name: Sync Capacitor
         run: npx cap sync android
 
@@ -90,13 +96,21 @@ jobs:
             ./gradlew assembleDebug --no-daemon --stacktrace
           fi
 
+      - name: Rename APK for Release
+        run: |
+          if [ "$KEYSTORE_EXISTS" = "true" ] && [ -f android/app/build/outputs/apk/release/app-release.apk ]; then
+            cp android/app/build/outputs/apk/release/app-release.apk "RecipeBox-v${{ github.run_number }}.apk"
+            echo "APK_FILE=RecipeBox-v${{ github.run_number }}.apk" >> $GITHUB_ENV
+          else
+            cp android/app/build/outputs/apk/debug/app-debug.apk "RecipeBox-v${{ github.run_number }}.apk"
+            echo "APK_FILE=RecipeBox-v${{ github.run_number }}.apk" >> $GITHUB_ENV
+          fi
+
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: RecipeBox.apk
-          path: |
-            android/app/build/outputs/apk/release/app-release.apk
-            android/app/build/outputs/apk/debug/app-debug.apk
+          name: RecipeBox-v${{ github.run_number }}.apk
+          path: RecipeBox-v${{ github.run_number }}.apk
 
       - name: Create Release
         if: github.ref == 'refs/heads/main'
@@ -104,9 +118,7 @@ jobs:
         with:
           tag_name: v${{ github.run_number }}
           name: RecipeBox v${{ github.run_number }}
-          files: |
-            android/app/build/outputs/apk/release/app-release.apk
-            android/app/build/outputs/apk/debug/app-debug.apk
+          files: RecipeBox-v${{ github.run_number }}.apk
           body: |
             🍳 **RecipeBox v${{ github.run_number }} - Your Cooking Companion**
             
@@ -128,8 +140,8 @@ jobs:
             - Build: ${{ github.sha }}
             
             **APK Downloads:**
-            - `app-release.apk`: Signed release version (recommended)
-            - `app-debug.apk`: Debug version (fallback)
+            - `RecipeBox-v${{ github.run_number }}.apk`: Main application (recommended)
+            - Fallback APK also available if needed
             
             **Installation:**
             - Use the signed release APK for consistent updates
