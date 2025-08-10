@@ -43,10 +43,10 @@ jobs:
       - name: Accept Android licenses
         run: yes | sdkmanager --licenses >/dev/null
 
-      - name: Install Pillow for Icon Generation
+      - name: Install Pillow for Icon Resizing
         run: pip install Pillow
 
-      - name: Generate Recipe Icons from Provided Image
+      - name: Resize Recipe Icon to Android Densities
         run: python3 use_provided_icon.py
 
       - name: Sync Capacitor
