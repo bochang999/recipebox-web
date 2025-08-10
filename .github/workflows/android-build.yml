@@ -284,7 +284,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Create Release with Debug APK (fallback)
-        if: github.ref == 'refs/heads/main' && !secrets.KEYSTORE_FILE
+        if: ${{ github.ref == 'refs/heads/main' && !secrets.KEYSTORE_FILE }}
         uses: softprops/action-gh-release@v2
         with:
           tag_name: v${{ github.run_number }}
