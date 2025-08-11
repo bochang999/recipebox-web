@@ -370,6 +370,22 @@ body {
     .app-header {
         padding-top: 60px; /* ステータスバー分の余白 */
     }
+    
+    .screen-header {
+        padding-top: 35px; /* 他の画面でもステータスバー分の余白 */
+    }
+}
+
+/* Android Chrome PWA用の安全エリア対応 */
+body {
+    padding-top: env(safe-area-inset-top);
+}
+
+/* モバイルブラウザでの表示改善 */
+@media (max-width: 480px) {
+    .screen-header {
+        padding-top: 25px; /* モバイル用の上部余白 */
+    }
 }
 
 /* タップ時のハイライト除去 */

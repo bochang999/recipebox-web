@@ -69,7 +69,15 @@ jobs:
           if [ ! -z "$KEYSTORE_FILE" ] && [ "$KEYSTORE_FILE" != "ZHVtbXkta2V5c3RvcmUtY29udGVudAo=" ]; then
             echo "Real keystore found, decoding..."
             echo "$KEYSTORE_FILE" | base64 --decode > android/app/keystore.jks
-            echo "KEYSTORE_EXISTS=true" >> $GITHUB_ENV
+            
+            # キーストアファイルの検証
+            if keytool -list -keystore android/app/keystore.jks -storepass "${{ secrets.KEYSTORE_PASSWORD }}" >/dev/null 2>&1; then
+              echo "Keystore validation successful"
+              echo "KEYSTORE_EXISTS=true" >> $GITHUB_ENV
+            else
+              echo "Keystore validation failed, will use debug signing"
+              echo "KEYSTORE_EXISTS=false" >> $GITHUB_ENV
+            fi
           else
             echo "No valid keystore found, will use debug signing"
             echo "KEYSTORE_EXISTS=false" >> $GITHUB_ENV
@@ -86,6 +94,19 @@ jobs:
           chmod +x gradlew
           if [ "$KEYSTORE_EXISTS" = "true" ]; then
             echo "Building signed release APK with versionCode=${VERSION_CODE}..."
+            
+            # キーエイリアスの自動検出
+            if [ -z "$KEY_ALIAS" ]; then
+              echo "Auto-detecting key alias..."
+              KEY_ALIAS=$(keytool -list -keystore app/keystore.jks -storepass "$KEYSTORE_PASSWORD" | grep "Alias name:" | head -n1 | cut -d':' -f2 | xargs)
+              echo "Detected key alias: $KEY_ALIAS"
+            fi
+            
+            # KEY_PASSWORDが未設定の場合はKEYSTORE_PASSWORDを使用
+            if [ -z "$KEY_PASSWORD" ]; then
+              KEY_PASSWORD="$KEYSTORE_PASSWORD"
+            fi
+            
             ./gradlew assembleRelease \
               -Pandroid.injected.signing.store.file=app/keystore.jks \
               -Pandroid.injected.signing.store.password="$KEYSTORE_PASSWORD" \
