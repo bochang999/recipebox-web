@@ -229,9 +229,6 @@ class RecipeBoxApp {
                 ]
             },
             {
-            {
-            {
-            {
                 id: 'recipe_008',
                 name: '16cmのフライパンでつくるピザ生地',
                 category: 'bread',
@@ -1283,9 +1280,11 @@ class RecipeBoxApp {
                 versions: [
                     { version: '1.0', date: '2025-08-10', changes: '初版作成' }
                 ]
-            },
-            {
+            }
+        ];
+    }
 
+    renderRecipes() {
         const htg = this.recipes.map(recipe => {
             const starIcon = recipe.isStarred ? '⭐' : '☆';
             const ingredientsSummary = recipe.ingredients.slice(0, 3).map(ing => {
