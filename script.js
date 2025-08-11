@@ -478,30 +478,6 @@ class RecipeBoxApp {
                 ]
             },
             {
-                id: 'recipe_015',
-                name: '玄米甘酒',
-                category: 'drink',
-                isStarred: false,
-                createdAt: '2025-08-10',
-                updatedAt: '2025-08-10',
-                servings: 1,
-                yield: '150g',
-                ingredients: [
-                    { name: '米', amount: 150, unit: 'g' },
-                    { name: '水', amount: 300, unit: 'g' },
-                    { name: '冷まし用水', amount: 360, unit: 'g' }
-                ],
-                steps: [
-                    '米を炊く',
-                    '炊いた米に水を加える',
-                    '冷まし用の水で温度調整する',
-                    '発酵させる'
-                ],
-                versions: [
-                    { version: '1.0', date: '2025-08-10', changes: '初版作成' }
-                ]
-            },
-            {
                 id: 'recipe_016',
                 name: '紅茶',
                 category: 'drink',
@@ -524,33 +500,6 @@ class RecipeBoxApp {
                 ]
             },
             {
-                id: 'recipe_017',
-                name: '塩ダレ',
-                category: 'sauce',
-                isStarred: true,
-                createdAt: '2025-08-10',
-                updatedAt: '2025-08-10',
-                servings: 1,
-                ingredients: [
-                    { name: '水', amount: 280, unit: 'g' },
-                    { name: '塩', amount: 27.9, unit: 'g' },
-                    { name: '料理酒', amount: 27.9, unit: 'g' },
-                    { name: '濃口しょうゆ', amount: 16.7, unit: 'g' },
-                    { name: 'ホタテ顆粒ダシ', amount: 15.6, unit: 'g' },
-                    { name: 'みりん', amount: 11.2, unit: 'g' },
-                    { name: 'うま味調味料', amount: 4, unit: 'g', note: '溶けなかったら2g' },
-                    { name: 'かつお節（厚削り）', amount: 4.5, unit: 'g' }
-                ],
-                steps: [
-                    '全ての材料を混ぜ合わせる',
-                    'うま味調味料が溶けない場合は2gに減らす',
-                    '味玉3個には塩ダレ21g + 水9g'
-                ],
-                versions: [
-                    { version: '1.0', date: '2025-08-10', changes: '初版作成' }
-                ]
-            },
-            {
                 id: 'recipe_018',
                 name: 'ドライトマト',
                 category: 'side',
@@ -567,30 +516,6 @@ class RecipeBoxApp {
                     '130度で60分乾燥させる'
                 ],
                 cookingTime: '60分',
-                versions: [
-                    { version: '1.0', date: '2025-08-10', changes: '初版作成' }
-                ]
-            },
-            {
-                id: 'recipe_019',
-                name: 'プリン',
-                category: 'dessert',
-                isStarred: false,
-                createdAt: '2025-08-10',
-                updatedAt: '2025-08-10',
-                servings: 1,
-                ingredients: [
-                    { name: 'ミルク', amount: 150, unit: 'g' },
-                    { name: '卵', amount: 1, unit: '個' },
-                    { name: 'キビ砂糖', amount: 15, unit: 'g', note: '大さじ1' }
-                ],
-                steps: [
-                    '材料を全て混ぜる',
-                    'スチームオーブン5分予熱',
-                    '150度で13分20秒',
-                    '冷却終わるまで待つ'
-                ],
-                cookingTime: '20分',
                 versions: [
                     { version: '1.0', date: '2025-08-10', changes: '初版作成' }
                 ]
