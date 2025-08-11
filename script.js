@@ -55,6 +55,35 @@ class RecipeBoxApp {
                 this.updatePortion(e.target.value);
             });
         }
+
+        // スマホの戻るボタン対応
+        this.setupBackButtonHandler();
+    }
+
+    // スマホの戻るボタンのハンドリング
+    setupBackButtonHandler() {
+        // ページ履歴管理
+        window.addEventListener('popstate', (event) => {
+            if (this.currentScreen === 'main-screen') {
+                // メイン画面にいる場合は何もしない（アプリ終了を防ぐ）
+                return;
+            } else if (this.currentScreen === 'recipe-detail-screen') {
+                // レシピ詳細からレシピ一覧へ
+                this.showScreen('recipes-screen');
+                event.preventDefault();
+            } else if (this.currentScreen === 'recipe-form-screen') {
+                // レシピ編集からレシピ一覧へ
+                this.showScreen('recipes-screen');
+                event.preventDefault();
+            } else {
+                // その他の画面からメインへ
+                this.showScreen('main-screen');
+                event.preventDefault();
+            }
+        });
+
+        // 初期履歴エントリーを追加
+        history.pushState({ screen: 'main-screen' }, '', '');
     }
 
     // 画面切り替え
@@ -69,6 +98,11 @@ class RecipeBoxApp {
         if (targetScreen) {
             targetScreen.classList.add('active');
             this.currentScreen = screenId;
+            
+            // 履歴管理
+            if (screenId !== 'main-screen') {
+                history.pushState({ screen: screenId }, '', '');
+            }
         }
     }
 
@@ -85,105 +119,6 @@ class RecipeBoxApp {
         return [
             {
                 id: 'recipe_001',
-                name: '至高の沼（食べきりサイズ）',
-                category: 'main',
-                isStarred: true,
-                createdAt: '2025-08-10',
-                updatedAt: '2025-08-10',
-                servings: 1,
-                ingredients: [
-                    { name: '米（白米・無洗米どちらでも）', amount: 100, unit: 'g' },
-                    { name: 'えのき', amount: 135, unit: 'g' },
-                    { name: '冷凍オクラ', amount: 45, unit: 'g' },
-                    { name: '冷凍ブロッコリー', amount: 67, unit: 'g' },
-                    { name: '鶏むね肉（皮なし）', amount: 235, unit: 'g' },
-                    { name: '水', amount: 530, unit: 'g' },
-                    { name: 'コショウ（粉末）', amount: 0.5, unit: 'g', note: '目安4振り' },
-                    { name: 'ガーリックパウダー', amount: 1.2, unit: 'g', note: '約5〜6振り' },
-                    { name: '鶏がらスープの素（顆粒）', amount: 4, unit: 'g' },
-                    { name: '塩（精製塩）', amount: 2, unit: 'g' },
-                    { name: 'カレー粉（S&Bなどの市販品）', amount: 5, unit: 'g' },
-                    { name: 'アジシオ（味変用）', amount: 0, unit: 'お好み', note: '1振り≒0.2g目安' }
-                ],
-                steps: [
-                    'すべての材料を炊飯器に入れる',
-                    '通常の炊飯モードで炊く',
-                    '炊き上がったらよく混ぜる',
-                    'アジシオで味を調整する'
-                ],
-                cookingTime: '炊飯時間',
-                versions: [
-                    { version: '1.0', date: '2025-08-10', changes: '初版作成' }
-                ]
-            },
-            {
-                id: 'recipe_002',
-                name: 'カロリーメイト風ブロック',
-                category: 'dessert',
-                isStarred: false,
-                createdAt: '2025-08-10',
-                updatedAt: '2025-08-10',
-                servings: 1,
-                yield: '約10本分',
-                ingredients: [
-                    { name: '小麦粉', amount: 200, unit: 'g' },
-                    { name: 'スキムミルク', amount: 50, unit: 'g' },
-                    { name: 'きな粉', amount: 50, unit: 'g' },
-                    { name: '砂糖', amount: 40, unit: 'g' },
-                    { name: '食塩', amount: 2, unit: 'g', note: '小さじ1/3' },
-                    { name: '溶かしバター', amount: 50, unit: 'g' },
-                    { name: '卵', amount: 50, unit: 'g', note: '1個' },
-                    { name: 'レシチン', amount: 2.5, unit: 'g', note: '2〜3g' },
-                    { name: '水 or 牛乳', amount: 50, unit: 'g' },
-                    { name: 'チョコチップ', amount: 60, unit: 'g' },
-                    { name: 'バニラエッセンス', amount: 0, unit: '少々' }
-                ],
-                steps: [
-                    'オーブンを170度に予熱する',
-                    '乾燥材料をすべてボウルで混ぜる',
-                    '溶かしバター、卵、水（牛乳）、バニラエッセンスを加える',
-                    'よく混ぜ合わせ、チョコチップを加える',
-                    '型に流し込み170度で15分焼く'
-                ],
-                cookingTime: '30分',
-                versions: [
-                    { version: '1.0', date: '2025-08-10', changes: '初版作成' }
-                ]
-            },
-            {
-                id: 'recipe_003',
-                name: 'パイの実風チョコチップ風スコーン',
-                category: 'dessert',
-                isStarred: false,
-                createdAt: '2025-08-10',
-                updatedAt: '2025-08-10',
-                servings: 1,
-                yield: '16個くらい',
-                ingredients: [
-                    { name: '薄力粉', amount: 120, unit: 'g' },
-                    { name: 'バター', amount: 50, unit: 'g' },
-                    { name: '牛乳', amount: 50, unit: 'g' },
-                    { name: '砂糖', amount: 30, unit: 'g' },
-                    { name: 'チョコチップ', amount: 30, unit: 'g' },
-                    { name: 'ベーキングパウダー', amount: 6, unit: 'g' },
-                    { name: '塩', amount: 1.2, unit: 'g' },
-                    { name: 'バニラエッセンス', amount: 0, unit: '少々' }
-                ],
-                steps: [
-                    'オーブンを180度に予熱する',
-                    '薄力粉、ベーキングパウダー、塩、砂糖をボウルで混ぜる',
-                    '冷たいバターを加えてそぼろ状にする',
-                    '牛乳、バニラエッセンスを加えて軽く混ぜる',
-                    'チョコチップを加える',
-                    '成形して180度で15分焼く'
-                ],
-                cookingTime: '30分',
-                versions: [
-                    { version: '1.0', date: '2025-08-10', changes: '初版作成' }
-                ]
-            },
-            {
-                id: 'recipe_004',
                 name: '豚の角煮',
                 category: 'main',
                 isStarred: true,
@@ -191,110 +126,219 @@ class RecipeBoxApp {
                 updatedAt: '2025-08-10',
                 servings: 1,
                 ingredients: [
-                    { name: '酒', amount: 40, unit: 'g' },
-                    { name: '砂糖', amount: 30, unit: 'g', note: '大さじ2' },
-                    { name: 'ハイミー', amount: 0, unit: '適量' },
-                    { name: 'カツオパウダー', amount: 0, unit: '適量' },
-                    { name: 'しょうゆ', amount: 30, unit: 'g', note: '大さじ2' },
-                    { name: 'にんにく', amount: 0, unit: '薄切り' },
-                    { name: 'しょうが', amount: 0, unit: '薄切り' },
-                    { name: '長ネギ', amount: 0, unit: 'ひとかけら' },
-                    { name: '水', amount: 160, unit: 'g' }
+                    { name: '豚バラブロック肉', amount: 500, unit: 'g' },
+                    { name: '酒', amount: 50, unit: 'ml' },
+                    { name: 'みりん', amount: 50, unit: 'ml' },
+                    { name: 'しょうゆ', amount: 50, unit: 'ml' },
+                    { name: '砂糖', amount: 30, unit: 'g' },
+                    { name: 'しょうが（薄切り）', amount: 15, unit: 'g' },
+                    { name: '長ねぎ（青い部分）', amount: 1, unit: '本分' },
+                    { name: '水', amount: 400, unit: 'ml' }
                 ],
                 steps: [
-                    '一度ホットクック スープで30分',
-                    'その後角煮モードで調理'
+                    '豚バラ肉を大きめに切る',
+                    'フライパンで表面を焼く',
+                    '圧力鍋に材料をすべて入れる',
+                    '20分加圧調理し、自然放置で冷ます'
                 ],
-                equipment: ['ホットクック'],
                 cookingTime: '1時間',
                 versions: [
                     { version: '1.0', date: '2025-08-10', changes: '初版作成' }
                 ]
             },
             {
-                id: 'recipe_005',
-                name: '角煮タレ',
-                category: 'sauce',
-                isStarred: false,
+                id: 'recipe_002',
+                name: '玄米甘酒',
+                category: 'drink',
+                isStarred: true,
                 createdAt: '2025-08-10',
                 updatedAt: '2025-08-10',
                 servings: 1,
-                yield: '出来上がり重量約40g分',
+                yield: '約500ml',
                 ingredients: [
-                    { name: '酒', amount: 15, unit: 'g', note: '大さじ1' },
-                    { name: 'みりん', amount: 15, unit: 'g', note: '大さじ1' },
-                    { name: '砂糖', amount: 7.5, unit: 'g', note: '大さじ1/2' },
-                    { name: 'しょうゆ', amount: 15, unit: 'g', note: '大さじ1' },
-                    { name: '白だし', amount: 5, unit: 'g', note: '小さじ1' },
-                    { name: 'しょうが（薄切り）', amount: 0, unit: '2枚' },
-                    { name: '水', amount: 15, unit: 'g', note: '大さじ1' }
+                    { name: '玄米ご飯', amount: 200, unit: 'g' },
+                    { name: '米麹（乾燥）', amount: 100, unit: 'g' },
+                    { name: '水', amount: 300, unit: 'ml' }
                 ],
                 steps: [
-                    '全ての材料を鍋に入れる',
-                    '豚バラなら40分煮込みモードの後に角煮モード',
-                    '肩ロースなら表面に焼き目をつけて角煮モード'
+                    '玄米ご飯を60℃まで冷ます',
+                    '米麹と水を混ぜ合わせる',
+                    '炊飯器の保温機能で8時間発酵',
+                    '途中2-3回かき混ぜる',
+                    '完成したら冷蔵保存'
                 ],
-                equipment: ['ホットクック'],
+                cookingTime: '8時間',
+                equipment: ['炊飯器'],
+                versions: [
+                    { version: '1.0', date: '2025-08-10', changes: '初版作成' }
+                ]
+            },
+            {
+                id: 'recipe_003',
+                name: '塩ダレ',
+                category: 'sauce',
+                isStarred: true,
+                createdAt: '2025-08-10',
+                updatedAt: '2025-08-10',
+                servings: 1,
+                yield: '約100ml',
+                ingredients: [
+                    { name: 'ごま油', amount: 30, unit: 'ml' },
+                    { name: '塩', amount: 6, unit: 'g' },
+                    { name: '鶏がらスープの素', amount: 4, unit: 'g' },
+                    { name: 'おろしにんにく', amount: 3, unit: 'g' },
+                    { name: '白胡椒', amount: 0.5, unit: 'g' },
+                    { name: 'レモン汁', amount: 10, unit: 'ml' }
+                ],
+                steps: [
+                    '全ての材料をボウルに入れる',
+                    'よく混ぜ合わせる',
+                    '冷蔵庫で30分馴染ませる'
+                ],
+                cookingTime: '5分',
+                note: 'サラダ、焼き肉、野菜炒めに',
+                versions: [
+                    { version: '1.0', date: '2025-08-10', changes: '初版作成' }
+                ]
+            },
+            {
+                id: 'recipe_004',
+                name: 'プリン',
+                category: 'dessert',
+                isStarred: true,
+                createdAt: '2025-08-10',
+                updatedAt: '2025-08-10',
+                servings: 4,
+                ingredients: [
+                    { name: '卵', amount: 3, unit: '個' },
+                    { name: '牛乳', amount: 300, unit: 'ml' },
+                    { name: '砂糖（プリン用）', amount: 50, unit: 'g' },
+                    { name: '砂糖（カラメル用）', amount: 60, unit: 'g' },
+                    { name: '水（カラメル用）', amount: 15, unit: 'ml' },
+                    { name: 'バニラエッセンス', amount: 0, unit: '少々' }
+                ],
+                steps: [
+                    'カラメルソースを作る（砂糖を焦がし水を加える）',
+                    'プリン液を作る（卵と砂糖を混ぜ、温めた牛乳を加える）',
+                    'プリン液を漉してカラメルの入った容器に注ぐ',
+                    '蒸し器で15分蒸すか、160℃オーブンで25分焼く'
+                ],
+                cookingTime: '45分',
+                versions: [
+                    { version: '1.0', date: '2025-08-10', changes: '初版作成' }
+                ]
+            },
+            {
+                id: 'recipe_005',
+                name: 'パン',
+                category: 'bread',
+                isStarred: true,
+                createdAt: '2025-08-10',
+                updatedAt: '2025-08-10',
+                servings: 1,
+                yield: '1斤分',
+                ingredients: [
+                    { name: '強力粉', amount: 300, unit: 'g' },
+                    { name: '水', amount: 200, unit: 'ml' },
+                    { name: 'ドライイースト', amount: 6, unit: 'g' },
+                    { name: '砂糖', amount: 20, unit: 'g' },
+                    { name: '塩', amount: 6, unit: 'g' },
+                    { name: 'バター', amount: 20, unit: 'g' }
+                ],
+                steps: [
+                    '材料を全てボウルに入れてこねる',
+                    '1次発酵（40℃で1時間）',
+                    'ガス抜きして成形',
+                    '2次発酵（40℃で40分）',
+                    '200℃で30分焼く'
+                ],
+                cookingTime: '3時間',
                 versions: [
                     { version: '1.0', date: '2025-08-10', changes: '初版作成' }
                 ]
             },
             {
                 id: 'recipe_006',
-                name: '鶏ささみむね肉干し肉',
+                name: 'お好み焼き（普通盛り）',
                 category: 'main',
-                isStarred: false,
+                isStarred: true,
                 createdAt: '2025-08-10',
                 updatedAt: '2025-08-10',
-                servings: 1,
+                servings: 2,
                 ingredients: [
-                    { name: '鶏ささみ', amount: 0, unit: '適量' }
+                    { name: 'キャベツ', amount: 300, unit: 'g' },
+                    { name: 'お好み焼き粉', amount: 100, unit: 'g' },
+                    { name: '水', amount: 120, unit: 'ml' },
+                    { name: '卵', amount: 2, unit: '個' },
+                    { name: '豚バラ薄切り肉', amount: 100, unit: 'g' },
+                    { name: 'お好み焼きソース', amount: 0, unit: '適量' },
+                    { name: 'マヨネーズ', amount: 0, unit: '適量' },
+                    { name: '青のり', amount: 0, unit: '適量' },
+                    { name: 'かつお節', amount: 0, unit: '適量' }
                 ],
                 steps: [
-                    '65℃で18時間低温調理する'
+                    'キャベツを粗めに刻む',
+                    'お好み焼き粉、水、卵を混ぜ合わせる',
+                    'キャベツを加えて混ぜる',
+                    'フライパンで豚肉を焼き、生地をのせる',
+                    '両面を焼いてソースとトッピングをかける'
                 ],
-                equipment: ['低温調理器'],
-                cookingTime: '18時間',
+                cookingTime: '30分',
                 versions: [
                     { version: '1.0', date: '2025-08-10', changes: '初版作成' }
                 ]
             },
             {
                 id: 'recipe_007',
-                name: '蒸しじゃがいも',
-                category: 'side',
-                isStarred: false,
+                name: 'シンプルホットケーキ',
+                category: 'dessert',
+                isStarred: true,
                 createdAt: '2025-08-10',
                 updatedAt: '2025-08-10',
-                servings: 1,
+                servings: 2,
                 ingredients: [
-                    { name: 'じゃがいも', amount: 0, unit: '適量' }
+                    { name: 'ホットケーキミックス', amount: 200, unit: 'g' },
+                    { name: '卵', amount: 1, unit: '個' },
+                    { name: '牛乳', amount: 150, unit: 'ml' },
+                    { name: 'バター', amount: 10, unit: 'g' },
+                    { name: 'メープルシロップ', amount: 0, unit: 'お好み' }
                 ],
                 steps: [
-                    '沸騰した水でじゃがいもを茹でる',
-                    '25分間茹でる'
+                    'ホットケーキミックス、卵、牛乳を混ぜる',
+                    'フライパンにバターを溶かす',
+                    '生地を流し入れて両面焼く',
+                    'メープルシロップをかけて完成'
                 ],
-                cookingTime: '25分',
+                cookingTime: '15分',
                 versions: [
                     { version: '1.0', date: '2025-08-10', changes: '初版作成' }
                 ]
             },
             {
                 id: 'recipe_008',
-                name: '大豆（オーブン焼き）',
-                category: 'side',
-                isStarred: false,
+                name: '16cmのフライパンでつくるピザ生地',
+                category: 'bread',
+                isStarred: true,
                 createdAt: '2025-08-10',
                 updatedAt: '2025-08-10',
                 servings: 1,
+                yield: '16cm 1枚分',
                 ingredients: [
-                    { name: '大豆', amount: 0, unit: '適量' }
+                    { name: '強力粉', amount: 100, unit: 'g' },
+                    { name: '薄力粉', amount: 50, unit: 'g' },
+                    { name: 'ドライイースト', amount: 3, unit: 'g' },
+                    { name: '砂糖', amount: 5, unit: 'g' },
+                    { name: '塩', amount: 3, unit: 'g' },
+                    { name: 'オリーブオイル', amount: 15, unit: 'ml' },
+                    { name: 'ぬるま湯', amount: 80, unit: 'ml' }
                 ],
                 steps: [
-                    'オーブンを150度に予熱する',
-                    '大豆をオーブンで30分焼く'
+                    '粉類を混ぜ合わせる',
+                    'オリーブオイルとぬるま湯を加えてこねる',
+                    '発酵させる（40分）',
+                    '16cmに伸ばしてフライパンで焼く'
                 ],
-                cookingTime: '30分',
+                cookingTime: '1時間30分',
                 versions: [
                     { version: '1.0', date: '2025-08-10', changes: '初版作成' }
                 ]
@@ -2095,6 +2139,7 @@ class RecipeBoxApp {
             // TODO: インストールボタンの表示
         });
     }
+
 }
 
 // グローバル関数（HTMLから呼び出し用）
