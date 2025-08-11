@@ -83,6 +83,35 @@ jobs:
             echo "KEYSTORE_EXISTS=false" >> $GITHUB_ENV
           fi
         
+      - name: APK Signing Diagnostics
+        working-directory: android
+        env:
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+        run: |
+          if [ "$KEYSTORE_EXISTS" = "true" ]; then
+            echo "=== KEYSTORE DIAGNOSTIC INFORMATION ==="
+            echo "Keystore file: app/keystore.jks"
+            echo "Key alias: $KEY_ALIAS"
+            
+            # キーストア証明書のフィンガープリント表示
+            keytool -list -v -keystore app/keystore.jks -alias "$KEY_ALIAS" -storepass "$KEYSTORE_PASSWORD" | grep -E "SHA256:|Owner:" || true
+            
+            # デバッグキーストアとの比較情報
+            echo ""
+            echo "=== DEBUG KEYSTORE COMPARISON ==="
+            echo "Debug keystore location: ~/.android/debug.keystore"
+            echo "Debug alias: androiddebugkey"
+            
+            # デバッグキーストアが存在する場合の情報
+            if [ -f ~/.android/debug.keystore ]; then
+              echo "Debug keystore found - extracting fingerprint:"
+              keytool -list -v -keystore ~/.android/debug.keystore -alias androiddebugkey -storepass android | grep -E "SHA256:" || true
+            else
+              echo "Debug keystore not found (this is normal in CI environment)"
+            fi
+          fi
+
       - name: Build Signed Android APK
         working-directory: android
         env:
@@ -139,6 +168,34 @@ jobs:
             echo "APK_FILE=RecipeBox-${VERSION}.apk" >> $GITHUB_ENV
             echo "VERSION=${VERSION}" >> $GITHUB_ENV
           fi
+
+      - name: APK Verification & Analysis
+        run: |
+          echo "=== FINAL APK ANALYSIS ==="
+          echo "APK file: ${{ env.APK_FILE }}"
+          
+          # APKの基本情報確認
+          if command -v aapt >/dev/null 2>&1; then
+            echo ""
+            echo "=== APK PACKAGE INFORMATION ==="
+            aapt dump badging "${{ env.APK_FILE }}" | grep -E "package|versionCode|versionName" || true
+          fi
+          
+          # APK署名の検証と証明書情報表示
+          if command -v apksigner >/dev/null 2>&1; then
+            echo ""
+            echo "=== APK SIGNATURE VERIFICATION ==="
+            apksigner verify --print-certs "${{ env.APK_FILE }}" || true
+          else
+            echo "apksigner not found - using alternative method"
+            # Fallback: jarsignerでの検証
+            jarsigner -verify -verbose -certs "${{ env.APK_FILE }}" | head -20 || true
+          fi
+          
+          # APKファイルサイズ確認
+          echo ""
+          echo "=== APK FILE SIZE ==="
+          ls -lh "${{ env.APK_FILE }}"
 
       - name: Upload APK
         uses: actions/upload-artifact@v4

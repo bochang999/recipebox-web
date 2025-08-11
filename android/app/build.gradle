@@ -5,13 +5,21 @@ android {
     compileSdk rootProject.ext.compileSdkVersion
     
     // 署名設定 - GitHub Actionsから渡されるプロパティを使用
-    if (project.hasProperty('android.injected.signing.store.file')) {
-        signingConfigs {
-            release {
+    signingConfigs {
+        debug {
+            // デバッグ版の署名設定（開発時）
+        }
+        release {
+            if (project.hasProperty('android.injected.signing.store.file')) {
                 storeFile file(project.property('android.injected.signing.store.file'))
                 storePassword project.property('android.injected.signing.store.password')
                 keyAlias project.property('android.injected.signing.key.alias')
                 keyPassword project.property('android.injected.signing.key.password')
+                
+                // 全署名バージョン有効化（提案に従い）
+                enableV1Signing true
+                enableV2Signing true 
+                enableV3Signing true
             }
         }
     }
@@ -30,6 +38,12 @@ android {
         }
     }
     buildTypes {
+        debug {
+            // 開発版は .debug サフィックスでパッケージ名を分離（提案採用）
+            applicationIdSuffix ".debug"
+            debuggable true
+            signingConfig signingConfigs.debug
+        }
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
