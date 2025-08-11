@@ -229,61 +229,8 @@ class RecipeBoxApp {
                 ]
             },
             {
-                id: 'recipe_005',
-                name: 'パン',
-                category: 'bread',
-                isStarred: true,
-                createdAt: '2025-08-10',
-                updatedAt: '2025-08-10',
-                servings: 1,
-                yield: '1斤分',
-                ingredients: [
-                    { name: '強力粉', amount: 300, unit: 'g' },
-                    { name: '水', amount: 200, unit: 'ml' },
-                    { name: 'ドライイースト', amount: 6, unit: 'g' },
-                    { name: '砂糖', amount: 20, unit: 'g' },
-                    { name: '塩', amount: 6, unit: 'g' },
-                    { name: 'バター', amount: 20, unit: 'g' }
-                ],
-                steps: [
-                    '材料を全てボウルに入れてこねる',
-                    '1次発酵（40℃で1時間）',
-                    'ガス抜きして成形',
-                    '2次発酵（40℃で40分）',
-                    '200℃で30分焼く'
-                ],
-                cookingTime: '3時間',
-                versions: [
-                    { version: '1.0', date: '2025-08-10', changes: '初版作成' }
-                ]
-            },
             {
             {
-                id: 'recipe_007',
-                name: 'シンプルホットケーキ',
-                category: 'dessert',
-                isStarred: true,
-                createdAt: '2025-08-10',
-                updatedAt: '2025-08-10',
-                servings: 2,
-                ingredients: [
-                    { name: 'ホットケーキミックス', amount: 200, unit: 'g' },
-                    { name: '卵', amount: 1, unit: '個' },
-                    { name: '牛乳', amount: 150, unit: 'ml' },
-                    { name: 'バター', amount: 10, unit: 'g' },
-                    { name: 'メープルシロップ', amount: 0, unit: 'お好み' }
-                ],
-                steps: [
-                    'ホットケーキミックス、卵、牛乳を混ぜる',
-                    'フライパンにバターを溶かす',
-                    '生地を流し入れて両面焼く',
-                    'メープルシロップをかけて完成'
-                ],
-                cookingTime: '15分',
-                versions: [
-                    { version: '1.0', date: '2025-08-10', changes: '初版作成' }
-                ]
-            },
             {
                 id: 'recipe_008',
                 name: '16cmのフライパンでつくるピザ生地',
