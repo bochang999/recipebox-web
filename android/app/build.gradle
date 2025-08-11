@@ -3,6 +3,19 @@ apply plugin: 'com.android.application'
 android {
     namespace "com.bochang.recipebox"
     compileSdk rootProject.ext.compileSdkVersion
+    
+    // 署名設定 - GitHub Actionsから渡されるプロパティを使用
+    if (project.hasProperty('android.injected.signing.store.file')) {
+        signingConfigs {
+            release {
+                storeFile file(project.property('android.injected.signing.store.file'))
+                storePassword project.property('android.injected.signing.store.password')
+                keyAlias project.property('android.injected.signing.key.alias')
+                keyPassword project.property('android.injected.signing.key.password')
+            }
+        }
+    }
+    
     defaultConfig {
         applicationId "com.bochang.recipebox"
         minSdkVersion rootProject.ext.minSdkVersion
@@ -20,6 +33,10 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            // 署名設定が存在する場合は使用
+            if (project.hasProperty('android.injected.signing.store.file')) {
+                signingConfig signingConfigs.release
+            }
         }
     }
 }
