@@ -11,7 +11,8 @@ android {
         }
         release {
             if (project.hasProperty('android.injected.signing.store.file')) {
-                storeFile file(project.property('android.injected.signing.store.file'))
+                // パス重複問題修正：相対パス指定で keystore.jks を直接参照
+                storeFile new File(projectDir, 'keystore.jks')
                 storePassword project.property('android.injected.signing.store.password')
                 keyAlias project.property('android.injected.signing.key.alias')
                 keyPassword project.property('android.injected.signing.key.password')
