@@ -258,36 +258,6 @@ class RecipeBoxApp {
                 ]
             },
             {
-                id: 'recipe_006',
-                name: 'お好み焼き（普通盛り）',
-                category: 'main',
-                isStarred: true,
-                createdAt: '2025-08-10',
-                updatedAt: '2025-08-10',
-                servings: 2,
-                ingredients: [
-                    { name: 'キャベツ', amount: 300, unit: 'g' },
-                    { name: 'お好み焼き粉', amount: 100, unit: 'g' },
-                    { name: '水', amount: 120, unit: 'ml' },
-                    { name: '卵', amount: 2, unit: '個' },
-                    { name: '豚バラ薄切り肉', amount: 100, unit: 'g' },
-                    { name: 'お好み焼きソース', amount: 0, unit: '適量' },
-                    { name: 'マヨネーズ', amount: 0, unit: '適量' },
-                    { name: '青のり', amount: 0, unit: '適量' },
-                    { name: 'かつお節', amount: 0, unit: '適量' }
-                ],
-                steps: [
-                    'キャベツを粗めに刻む',
-                    'お好み焼き粉、水、卵を混ぜ合わせる',
-                    'キャベツを加えて混ぜる',
-                    'フライパンで豚肉を焼き、生地をのせる',
-                    '両面を焼いてソースとトッピングをかける'
-                ],
-                cookingTime: '30分',
-                versions: [
-                    { version: '1.0', date: '2025-08-10', changes: '初版作成' }
-                ]
-            },
             {
                 id: 'recipe_007',
                 name: 'シンプルホットケーキ',
@@ -1368,49 +1338,6 @@ class RecipeBoxApp {
                 ]
             },
             {
-                id: 'recipe_051',
-                name: '16cmのフライパンでつくるピザ生地',
-                category: 'main',
-                isStarred: false,
-                createdAt: '2025-08-10',
-                updatedAt: '2025-08-10',
-                servings: 1,
-                ingredients: [
-                    { name: '強力粉', amount: 80, unit: 'g' },
-                    { name: '水', amount: 50, unit: 'g' },
-                    { name: 'イースト菌', amount: 0.8, unit: 'g' },
-                    { name: 'オリーブオイル', amount: 1.6, unit: 'g' },
-                    { name: '砂糖', amount: 0.2, unit: 'g' },
-                    { name: '塩', amount: 2.1, unit: 'g' },
-                    { name: 'トマト缶', amount: 50, unit: 'g' }
-                ],
-                steps: [
-                    '材料を混ぜてこねる',
-                    '発酵させる',
-                    'フライパンサイズに伸ばす',
-                    'トマトソースを塗ってトッピングを乗せる',
-                    'フライパンで焼く'
-                ],
-                cookingTime: '30分（発酵含む）',
-                versions: [
-                    { version: '1.0', date: '2025-08-10', changes: '初版作成' }
-                ]
-            }
-        ];
-    }
-
-    saveRecipes() {
-        localStorage.setItem('recipebox-recipes', JSON.stringify(this.recipes));
-    }
-
-    renderRecipes() {
-        const container = document.getElementById('recipes-list');
-        if (!container) return;
-
-        if (this.recipes.length === 0) {
-            container.innerHTML = '<p class="empty-message">レシピがまだありません。「＋追加」でレシピを追加しましょう。</p>';
-            return;
-        }
 
         const htg = this.recipes.map(recipe => {
             const starIcon = recipe.isStarred ? '⭐' : '☆';
