@@ -8,7 +8,7 @@ android {
     if (project.hasProperty('android.injected.signing.store.file')) {
         signingConfigs {
             release {
-                storeFile new File(projectDir, project.property('android.injected.signing.store.file'))
+                storeFile file(project.property('android.injected.signing.store.file'))
                 storePassword project.property('android.injected.signing.store.password')
                 keyAlias project.property('android.injected.signing.key.alias')
                 keyPassword project.property('android.injected.signing.key.password')
