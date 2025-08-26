@@ -19,11 +19,12 @@ android {
 
     signingConfigs {
         release {
-            if (project.hasProperty('android.injected.signing.store.file')) {
-                storeFile file(project.property('android.injected.signing.store.file'))
-                storePassword project.property('android.injected.signing.store.password')
-                keyAlias project.property('android.injected.signing.key.alias')
-                keyPassword project.property('android.injected.signing.key.password')
+            def sf = System.getenv("KEYSTORE_FILE")
+            if (sf) {
+                storeFile file(sf)
+                storePassword System.getenv("KEYSTORE_PASSWORD")
+                keyAlias System.getenv("KEY_ALIAS")
+                keyPassword System.getenv("KEY_PASSWORD")
             }
         }
     }
@@ -32,9 +33,7 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-            if (project.hasProperty('android.injected.signing.store.file')) {
-                signingConfig signingConfigs.release
-            }
+            signingConfig signingConfigs.release
         }
     }
 }

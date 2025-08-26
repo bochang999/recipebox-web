@@ -78,6 +78,7 @@ jobs:
       - name: Build Signed Android APK
         working-directory: android
         env:
+          KEYSTORE_FILE: ${{ github.workspace }}/android/keystore.jks
           KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
           KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
           KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
@@ -87,10 +88,6 @@ jobs:
           if [ "$KEYSTORE_EXISTS" = "true" ]; then
             echo "Building signed release APK with versionCode=${VERSION_CODE}..."
             ./gradlew assembleRelease \
-              -Pandroid.injected.signing.store.file=android/keystore.jks \
-              -Pandroid.injected.signing.store.password="$KEYSTORE_PASSWORD" \
-              -Pandroid.injected.signing.key.alias="$KEY_ALIAS" \
-              -Pandroid.injected.signing.key.password="$KEY_PASSWORD" \
               -Pandroid.injected.version.code="$VERSION_CODE" \
               -Pandroid.injected.version.name="1.$(printf '%02d' $VERSION_CODE)" \
               --no-daemon --stacktrace
