@@ -121,7 +121,6 @@ class RecipeBoxApp {
                 id: 'recipe_001',
                 name: '豚の角煮',
                 category: 'main',
-                isStarred: true,
                 createdAt: '2025-08-10',
                 updatedAt: '2025-08-10',
                 servings: 1,
@@ -150,7 +149,6 @@ class RecipeBoxApp {
                 id: 'recipe_002',
                 name: '玄米甘酒',
                 category: 'drink',
-                isStarred: true,
                 createdAt: '2025-08-10',
                 updatedAt: '2025-08-10',
                 servings: 1,
@@ -177,7 +175,6 @@ class RecipeBoxApp {
                 id: 'recipe_003',
                 name: '塩ダレ',
                 category: 'sauce',
-                isStarred: true,
                 createdAt: '2025-08-10',
                 updatedAt: '2025-08-10',
                 servings: 1,
@@ -205,7 +202,6 @@ class RecipeBoxApp {
                 id: 'recipe_004',
                 name: 'プリン',
                 category: 'dessert',
-                isStarred: true,
                 createdAt: '2025-08-10',
                 updatedAt: '2025-08-10',
                 servings: 4,
@@ -232,7 +228,6 @@ class RecipeBoxApp {
                 id: 'recipe_005',
                 name: 'パン',
                 category: 'bread',
-                isStarred: true,
                 createdAt: '2025-08-10',
                 updatedAt: '2025-08-10',
                 servings: 1,
@@ -261,7 +256,6 @@ class RecipeBoxApp {
                 id: 'recipe_006',
                 name: 'お好み焼き（普通盛り）',
                 category: 'main',
-                isStarred: true,
                 createdAt: '2025-08-10',
                 updatedAt: '2025-08-10',
                 servings: 2,
@@ -292,7 +286,6 @@ class RecipeBoxApp {
                 id: 'recipe_007',
                 name: 'シンプルホットケーキ',
                 category: 'dessert',
-                isStarred: true,
                 createdAt: '2025-08-10',
                 updatedAt: '2025-08-10',
                 servings: 2,
@@ -318,7 +311,6 @@ class RecipeBoxApp {
                 id: 'recipe_008',
                 name: '16cmのフライパンでつくるピザ生地',
                 category: 'bread',
-                isStarred: true,
                 createdAt: '2025-08-10',
                 updatedAt: '2025-08-10',
                 servings: 1,
@@ -347,7 +339,6 @@ class RecipeBoxApp {
                 id: 'recipe_009',
                 name: 'マイルド経口補水液',
                 category: 'drink',
-                isStarred: false,
                 createdAt: '2025-08-10',
                 updatedAt: '2025-08-10',
                 servings: 1,
@@ -370,7 +361,6 @@ class RecipeBoxApp {
                 id: 'recipe_010',
                 name: 'ガチの経口補水液',
                 category: 'drink',
-                isStarred: false,
                 createdAt: '2025-08-10',
                 updatedAt: '2025-08-10',
                 servings: 1,
@@ -392,7 +382,6 @@ class RecipeBoxApp {
                 id: 'recipe_011',
                 name: 'コーントルティーヤ',
                 category: 'main',
-                isStarred: false,
                 createdAt: '2025-08-10',
                 updatedAt: '2025-08-10',
                 servings: 1,
@@ -416,7 +405,6 @@ class RecipeBoxApp {
                 id: 'recipe_012',
                 name: 'うなぎの蒲焼のタレ',
                 category: 'sauce',
-                isStarred: true,
                 createdAt: '2025-08-10',
                 updatedAt: '2025-08-10',
                 servings: 1,
@@ -439,7 +427,6 @@ class RecipeBoxApp {
                 id: 'recipe_013',
                 name: '1.6mmパスタ',
                 category: 'main',
-                isStarred: false,
                 createdAt: '2025-08-10',
                 updatedAt: '2025-08-10',
                 servings: 1,
@@ -462,7 +449,6 @@ class RecipeBoxApp {
                 id: 'recipe_014',
                 name: '生パスタ（2mm）',
                 category: 'main',
-                isStarred: false,
                 createdAt: '2025-08-10',
                 updatedAt: '2025-08-10',
                 servings: 1,
@@ -481,7 +467,6 @@ class RecipeBoxApp {
                 id: 'recipe_015',
                 name: '玄米甘酒',
                 category: 'drink',
-                isStarred: false,
                 createdAt: '2025-08-10',
                 updatedAt: '2025-08-10',
                 servings: 1,
@@ -505,7 +490,6 @@ class RecipeBoxApp {
                 id: 'recipe_016',
                 name: '紅茶',
                 category: 'drink',
-                isStarred: false,
                 createdAt: '2025-08-10',
                 updatedAt: '2025-08-10',
                 servings: 1,
@@ -527,7 +511,6 @@ class RecipeBoxApp {
                 id: 'recipe_017',
                 name: '塩ダレ',
                 category: 'sauce',
-                isStarred: true,
                 createdAt: '2025-08-10',
                 updatedAt: '2025-08-10',
                 servings: 1,
@@ -554,7 +537,6 @@ class RecipeBoxApp {
                 id: 'recipe_018',
                 name: 'ドライトマト',
                 category: 'side',
-                isStarred: false,
                 createdAt: '2025-08-10',
                 updatedAt: '2025-08-10',
                 servings: 1,
@@ -575,7 +557,6 @@ class RecipeBoxApp {
                 id: 'recipe_019',
                 name: 'プリン',
                 category: 'dessert',
-                isStarred: false,
                 createdAt: '2025-08-10',
                 updatedAt: '2025-08-10',
                 servings: 1,
@@ -599,7 +580,6 @@ class RecipeBoxApp {
                 id: 'recipe_020',
                 name: 'ミルクプリン',
                 category: 'dessert',
-                isStarred: false,
                 createdAt: '2025-08-10',
                 updatedAt: '2025-08-10',
                 servings: 1,
@@ -621,7 +601,6 @@ class RecipeBoxApp {
                 id: 'recipe_021',
                 name: '白マヨネーズ',
                 category: 'sauce',
-                isStarred: false,
                 createdAt: '2025-08-10',
                 updatedAt: '2025-08-10',
                 servings: 1,
@@ -644,7 +623,6 @@ class RecipeBoxApp {
                 id: 'recipe_022',
                 name: 'パン',
                 category: 'main',
-                isStarred: true,
                 createdAt: '2025-08-10',
                 updatedAt: '2025-08-10',
                 servings: 1,
@@ -675,7 +653,6 @@ class RecipeBoxApp {
                 id: 'recipe_023',
                 name: 'ドーナツ',
                 category: 'dessert',
-                isStarred: false,
                 createdAt: '2025-08-10',
                 updatedAt: '2025-08-10',
                 servings: 1,
@@ -700,7 +677,6 @@ class RecipeBoxApp {
                 id: 'recipe_024',
                 name: 'お好み焼き（大盛り）',
                 category: 'main',
-                isStarred: true,
                 createdAt: '2025-08-10',
                 updatedAt: '2025-08-10',
                 servings: 1,
@@ -738,7 +714,6 @@ class RecipeBoxApp {
                 id: 'recipe_025',
                 name: 'お好み焼き（普通盛り）',
                 category: 'main',
-                isStarred: false,
                 createdAt: '2025-08-10',
                 updatedAt: '2025-08-10',
                 servings: 1,
@@ -779,7 +754,6 @@ class RecipeBoxApp {
                 id: 'recipe_026',
                 name: 'シンプルホットケーキ',
                 category: 'dessert',
-                isStarred: false,
                 createdAt: '2025-08-10',
                 updatedAt: '2025-08-10',
                 servings: 1,
@@ -814,7 +788,6 @@ class RecipeBoxApp {
                 id: 'recipe_027',
                 name: 'ラーメン麺（自作）',
                 category: 'main',
-                isStarred: false,
                 createdAt: '2025-08-10',
                 updatedAt: '2025-08-10',
                 servings: 1,
@@ -838,7 +811,6 @@ class RecipeBoxApp {
                 id: 'recipe_028',
                 name: '餃子の皮',
                 category: 'main',
-                isStarred: false,
                 createdAt: '2025-08-10',
                 updatedAt: '2025-08-10',
                 servings: 1,
@@ -863,7 +835,6 @@ class RecipeBoxApp {
                 id: 'recipe_029',
                 name: '餃子の具',
                 category: 'main',
-                isStarred: true,
                 createdAt: '2025-08-10',
                 updatedAt: '2025-08-10',
                 servings: 1,
@@ -898,7 +869,6 @@ class RecipeBoxApp {
                 id: 'recipe_030',
                 name: '簡単な醤油ラーメンスープ',
                 category: 'main',
-                isStarred: false,
                 createdAt: '2025-08-10',
                 updatedAt: '2025-08-10',
                 servings: 1,
@@ -925,7 +895,6 @@ class RecipeBoxApp {
                 id: 'recipe_031',
                 name: 'トマトラーメンスープ',
                 category: 'main',
-                isStarred: false,
                 createdAt: '2025-08-10',
                 updatedAt: '2025-08-10',
                 servings: 1,
@@ -953,7 +922,6 @@ class RecipeBoxApp {
                 id: 'recipe_032',
                 name: '出汁',
                 category: 'sauce',
-                isStarred: false,
                 createdAt: '2025-08-10',
                 updatedAt: '2025-08-10',
                 servings: 1,
@@ -976,7 +944,6 @@ class RecipeBoxApp {
                 id: 'recipe_033',
                 name: 'かけつゆ（150g）',
                 category: 'sauce',
-                isStarred: false,
                 createdAt: '2025-08-10',
                 updatedAt: '2025-08-10',
                 servings: 1,
@@ -1002,7 +969,6 @@ class RecipeBoxApp {
                 id: 'recipe_034',
                 name: '鶏ささみ（低温調理）',
                 category: 'main',
-                isStarred: false,
                 createdAt: '2025-08-10',
                 updatedAt: '2025-08-10',
                 servings: 1,
@@ -1025,7 +991,6 @@ class RecipeBoxApp {
                 id: 'recipe_035',
                 name: 'オーロラソース',
                 category: 'sauce',
-                isStarred: false,
                 createdAt: '2025-08-10',
                 updatedAt: '2025-08-10',
                 servings: 1,
@@ -1046,7 +1011,6 @@ class RecipeBoxApp {
                 id: 'recipe_036',
                 name: 'ヨーグルト',
                 category: 'dessert',
-                isStarred: false,
                 createdAt: '2025-08-10',
                 updatedAt: '2025-08-10',
                 servings: 1,
@@ -1071,7 +1035,6 @@ class RecipeBoxApp {
                 id: 'recipe_037',
                 name: '飲むヨーグルト',
                 category: 'drink',
-                isStarred: false,
                 createdAt: '2025-08-10',
                 updatedAt: '2025-08-10',
                 servings: 1,
@@ -1093,7 +1056,6 @@ class RecipeBoxApp {
                 id: 'recipe_038',
                 name: 'チーズブリトー',
                 category: 'main',
-                isStarred: false,
                 createdAt: '2025-08-10',
                 updatedAt: '2025-08-10',
                 servings: 1,
@@ -1122,7 +1084,6 @@ class RecipeBoxApp {
                 id: 'recipe_039',
                 name: 'クレープ',
                 category: 'dessert',
-                isStarred: false,
                 createdAt: '2025-08-10',
                 updatedAt: '2025-08-10',
                 servings: 1,
@@ -1147,7 +1108,6 @@ class RecipeBoxApp {
                 id: 'recipe_040',
                 name: '美味いクレープ生地',
                 category: 'dessert',
-                isStarred: true,
                 createdAt: '2025-08-10',
                 updatedAt: '2025-08-10',
                 servings: 1,
@@ -1176,7 +1136,6 @@ class RecipeBoxApp {
                 id: 'recipe_041',
                 name: 'クラッカー',
                 category: 'dessert',
-                isStarred: false,
                 createdAt: '2025-08-10',
                 updatedAt: '2025-08-10',
                 servings: 1,
@@ -1205,7 +1164,6 @@ class RecipeBoxApp {
                 id: 'recipe_042',
                 name: 'クリスピーピザ生地',
                 category: 'main',
-                isStarred: false,
                 createdAt: '2025-08-10',
                 updatedAt: '2025-08-10',
                 servings: 1,
@@ -1231,7 +1189,6 @@ class RecipeBoxApp {
                 id: 'recipe_043',
                 name: 'りんごのケーキ',
                 category: 'dessert',
-                isStarred: false,
                 createdAt: '2025-08-10',
                 updatedAt: '2025-08-10',
                 servings: 1,
@@ -1260,7 +1217,6 @@ class RecipeBoxApp {
                 id: 'recipe_044',
                 name: 'パンチェッタ',
                 category: 'main',
-                isStarred: false,
                 createdAt: '2025-08-10',
                 updatedAt: '2025-08-10',
                 servings: 1,
@@ -1286,7 +1242,6 @@ class RecipeBoxApp {
                 id: 'recipe_045',
                 name: '鶏油の取り方',
                 category: 'sauce',
-                isStarred: true,
                 createdAt: '2025-08-10',
                 updatedAt: '2025-08-10',
                 servings: 1,
@@ -1315,7 +1270,6 @@ class RecipeBoxApp {
                 id: 'recipe_046',
                 name: '鶏出汁の取り方',
                 category: 'sauce',
-                isStarred: true,
                 createdAt: '2025-08-10',
                 updatedAt: '2025-08-10',
                 servings: 1,
@@ -1342,7 +1296,6 @@ class RecipeBoxApp {
                 id: 'recipe_047',
                 name: '塩ラーメンスープの黄金比',
                 category: 'main',
-                isStarred: true,
                 createdAt: '2025-08-10',
                 updatedAt: '2025-08-10',
                 servings: 1,
@@ -1367,7 +1320,6 @@ class RecipeBoxApp {
                 id: 'recipe_048',
                 name: 'ラーメンベース',
                 category: 'main',
-                isStarred: false,
                 createdAt: '2025-08-10',
                 updatedAt: '2025-08-10',
                 servings: 1,
@@ -1395,7 +1347,6 @@ class RecipeBoxApp {
                 id: 'recipe_049',
                 name: '半とんこつラーメン',
                 category: 'main',
-                isStarred: false,
                 createdAt: '2025-08-10',
                 updatedAt: '2025-08-10',
                 servings: 1,
@@ -1423,7 +1374,6 @@ class RecipeBoxApp {
                 id: 'recipe_050',
                 name: '冷やし中華醤油ダレ',
                 category: 'sauce',
-                isStarred: false,
                 createdAt: '2025-08-10',
                 updatedAt: '2025-08-10',
                 servings: 1,
@@ -1446,7 +1396,6 @@ class RecipeBoxApp {
                 id: 'recipe_051',
                 name: '16cmのフライパンでつくるピザ生地',
                 category: 'main',
-                isStarred: false,
                 createdAt: '2025-08-10',
                 updatedAt: '2025-08-10',
                 servings: 1,
@@ -1488,7 +1437,7 @@ class RecipeBoxApp {
         }
 
         const htg = this.recipes.map(recipe => {
-            const starIcon = recipe.isStarred ? '⭐' : '☆';
+            const viewCount = recipe.viewCount || 0;
             const ingredientsSummary = recipe.ingredients.slice(0, 3).map(ing => {
                 let amountText = '';
                 if (ing.amount > 0) {
@@ -1503,7 +1452,7 @@ class RecipeBoxApp {
                 <div class="recipe-item" data-id="${recipe.id}" onclick="app.viewRecipe('${recipe.id}')" style="cursor: pointer;">
                     <div class="recipe-header">
                         <h3 class="recipe-title">${recipe.name}</h3>
-                        <button class="star-button" onclick="event.stopPropagation(); app.toggleStar('${recipe.id}')">${starIcon}</button>
+                        <span class="view-count">👀 ${viewCount}</span>
                     </div>
                     <div class="recipe-meta">
                         <span class="recipe-servings">${recipe.servings}人前</span>
@@ -1552,11 +1501,12 @@ class RecipeBoxApp {
             case 'name':
                 this.recipes.sort((a, b) => a.name.localeCompare(b.name));
                 break;
-            case 'starred':
+            case 'popular':
                 this.recipes.sort((a, b) => {
-                    if (a.isStarred && !b.isStarred) return -1;
-                    if (!a.isStarred && b.isStarred) return 1;
-                    return new Date(b.updatedAt) - new Date(a.updatedAt);
+                    const aViews = a.viewCount || 0;
+                    const bViews = b.viewCount || 0;
+                    if (bViews !== aViews) return bViews - aViews; // 閲覧回数降順
+                    return new Date(b.updatedAt) - new Date(a.updatedAt); // 同じ場合は更新日時順
                 });
                 break;
         }
@@ -1564,18 +1514,15 @@ class RecipeBoxApp {
         this.renderRecipes();
     }
 
-    toggleStar(recipeId) {
-        const recipe = this.recipes.find(r => r.id === recipeId);
-        if (recipe) {
-            recipe.isStarred = !recipe.isStarred;
-            this.saveRecipes();
-            this.renderRecipes();
-        }
-    }
 
     viewRecipe(recipeId) {
         const recipe = this.recipes.find(r => r.id === recipeId);
         if (!recipe) return;
+
+        // 閲覧回数をカウントアップ
+        recipe.viewCount = (recipe.viewCount || 0) + 1;
+        recipe.lastViewedAt = new Date().toISOString();
+        this.saveRecipes(); // LocalStorageに保存
 
         this.currentRecipe = recipe;
         this.currentPortion = 1;
@@ -1807,7 +1754,6 @@ class RecipeBoxApp {
         document.getElementById('recipe-time').value = recipe.cookingTime || '';
         document.getElementById('recipe-equipment').value = recipe.equipment ? recipe.equipment.join(', ') : '';
         document.getElementById('recipe-notes').value = recipe.notes || '';
-        document.getElementById('recipe-starred').checked = recipe.isStarred || false;
         
         // 材料
         const ingredientsContainer = document.getElementById('ingredients-container');
@@ -1955,7 +1901,6 @@ class RecipeBoxApp {
         const cookingTime = document.getElementById('recipe-time').value.trim();
         const equipment = document.getElementById('recipe-equipment').value.split(',').map(s => s.trim()).filter(s => s);
         const notes = document.getElementById('recipe-notes').value.trim();
-        const isStarred = document.getElementById('recipe-starred').checked;
         
         // 材料収集
         const ingredients = [];
@@ -1986,7 +1931,6 @@ class RecipeBoxApp {
             cookingTime,
             equipment,
             notes,
-            isStarred,
             ingredients,
             steps
         };
@@ -2019,7 +1963,8 @@ class RecipeBoxApp {
             id: newId,
             name: data.name,
             category: data.category,
-            isStarred: data.isStarred,
+            viewCount: 0,
+            lastViewedAt: null,
             createdAt: now,
             updatedAt: now,
             servings: data.servings,
@@ -2052,7 +1997,6 @@ class RecipeBoxApp {
         Object.assign(recipe, {
             name: data.name,
             category: data.category,
-            isStarred: data.isStarred,
             updatedAt: now,
             servings: data.servings,
             cookingTime: data.cookingTime,
