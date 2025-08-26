@@ -1,0 +1,244 @@
+name: Build PWA Template APK
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+env:
+  JAVA_VERSION: '17'
+  NODE_VERSION: '18'
+  
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+        cache: 'npm'
+
+    - name: Setup Java JDK
+      uses: actions/setup-java@v4
+      with:
+        distribution: 'temurin'
+        java-version: ${{ env.JAVA_VERSION }}
+
+    - name: Cache Gradle dependencies
+      uses: actions/cache@v3
+      with:
+        path: |
+          ~/.gradle/caches
+          ~/.gradle/wrapper
+        key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+        restore-keys: |
+          ${{ runner.os }}-gradle-
+
+    - name: Install Dependencies
+      run: |
+        npm ci
+        npm install -g @capacitor/cli
+
+    - name: Validate PWA Assets
+      run: |
+        echo "🔍 PWA設定ファイル確認"
+        if [ -f "manifest.json" ]; then
+          echo "✅ manifest.json 存在確認"
+          cat manifest.json | jq '.' > /dev/null && echo "✅ JSON形式正常" || exit 1
+        else
+          echo "❌ manifest.json が見つかりません"
+          exit 1
+        fi
+        
+        if [ -f "sw.js" ]; then
+          echo "✅ Service Worker存在確認"
+        else
+          echo "⚠️ Service Workerがありません（オプション）"
+        fi
+
+    - name: Generate Version Tag
+      id: version
+      run: |
+        VERSION_TAG="1.0.${{ github.run_number }}"
+        echo "VERSION_TAG=${VERSION_TAG}" >> $GITHUB_ENV
+        echo "🏷️ バージョンタグ: ${VERSION_TAG}"
+
+    - name: Update App Version
+      run: |
+        # package.jsonのバージョン更新
+        jq --arg version "${{ env.VERSION_TAG }}" '.version = $version' package.json > package.json.tmp
+        mv package.json.tmp package.json
+        
+        # manifestのバージョン更新
+        jq --arg version "${{ env.VERSION_TAG }}" '.version = $version' manifest.json > manifest.json.tmp
+        mv manifest.json.tmp manifest.json
+        
+        echo "📝 バージョン ${{ env.VERSION_TAG }} に更新完了"
+
+    - name: Initialize Capacitor Project
+      run: |
+        echo "🔧 Capacitor初期化開始"
+        
+        # プロジェクト初期化（既存設定を使用）
+        npx cap init --web-dir ./ || echo "既に初期化済み"
+        
+        # Androidプラットフォーム追加
+        npx cap add android || echo "Android既に追加済み"
+        
+        echo "✅ Capacitor初期化完了"
+
+    - name: Setup Keystore from GitHub Secrets
+      run: |
+        echo "🔑 キーストア設定開始"
+        
+        if [ -z "${{ secrets.KEYSTORE_B64 }}" ]; then
+          echo "⚠️ GitHub Secrets未設定 - テンプレート用キーストア生成"
+          keytool -genkeypair -v \
+            -keystore template-release.keystore \
+            -alias template-key \
+            -keyalg RSA \
+            -keysize 2048 \
+            -validity 10000 \
+            -dname "CN=PWA Template,OU=Template,O=Development,L=Tokyo,ST=Tokyo,C=JP" \
+            -storepass template123 \
+            -keypass template123
+          
+          echo "KEYSTORE_PASSWORD=template123" >> $GITHUB_ENV
+          echo "KEY_ALIAS=template-key" >> $GITHUB_ENV
+          echo "KEY_PASSWORD=template123" >> $GITHUB_ENV
+        else
+          echo "✅ GitHub Secrets設定済み - 本番キーストア使用"
+          echo "${{ secrets.KEYSTORE_B64 }}" | base64 --decode > template-release.keystore
+          
+          echo "KEYSTORE_PASSWORD=${{ secrets.KEYSTORE_PASSWORD }}" >> $GITHUB_ENV
+          echo "KEY_ALIAS=${{ secrets.KEY_ALIAS }}" >> $GITHUB_ENV
+          echo "KEY_PASSWORD=${{ secrets.KEY_PASSWORD }}" >> $GITHUB_ENV
+        fi
+        
+        echo "🔐 キーストア設定完了"
+
+    - name: Sync Capacitor
+      run: |
+        echo "🔄 Capacitor同期開始"
+        npx cap sync android
+        echo "✅ Capacitor同期完了"
+
+    - name: Build Android APK
+      run: |
+        echo "🏗️ Android APK ビルド開始"
+        cd android
+        
+        # Gradleラッパーに実行権限付与
+        chmod +x ./gradlew
+        
+        # APKビルド
+        ./gradlew assembleRelease --stacktrace
+        
+        echo "✅ APK ビルド完了"
+
+    - name: Sign APK
+      run: |
+        echo "✍️ APK署名開始"
+        
+        cd android/app/build/outputs/apk/release
+        
+        # APK署名
+        jarsigner -verbose \
+          -keystore ../../../../../template-release.keystore \
+          -storepass ${{ env.KEYSTORE_PASSWORD }} \
+          -keypass ${{ env.KEY_PASSWORD }} \
+          -signedjar app-release-signed.apk \
+          app-release-unsigned.apk \
+          ${{ env.KEY_ALIAS }}
+        
+        # zipalign実行
+        $ANDROID_HOME/build-tools/$(ls $ANDROID_HOME/build-tools | tail -1)/zipalign -v 4 \
+          app-release-signed.apk \
+          pwatemplate_${{ env.VERSION_TAG }}.apk
+        
+        echo "🎯 署名完了: pwatemplate_${{ env.VERSION_TAG }}.apk"
+
+    - name: Verify APK
+      run: |
+        echo "🔍 APK検証開始"
+        
+        APK_PATH="android/app/build/outputs/apk/release/pwatemplate_${{ env.VERSION_TAG }}.apk"
+        
+        if [ -f "$APK_PATH" ]; then
+          APK_SIZE=$(du -h "$APK_PATH" | cut -f1)
+          echo "✅ APK生成成功: $APK_SIZE"
+          
+          # APK情報表示
+          $ANDROID_HOME/build-tools/$(ls $ANDROID_HOME/build-tools | tail -1)/aapt dump badging "$APK_PATH" | head -5
+        else
+          echo "❌ APK生成失敗"
+          exit 1
+        fi
+
+    - name: Upload APK Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: PWA-Template-APK-${{ env.VERSION_TAG }}
+        path: android/app/build/outputs/apk/release/pwatemplate_${{ env.VERSION_TAG }}.apk
+        retention-days: 30
+
+    - name: Create Release (on main branch)
+      if: github.ref == 'refs/heads/main'
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: v${{ env.VERSION_TAG }}
+        release_name: PWA Template v${{ env.VERSION_TAG }}
+        body: |
+          ## 📱 PWA Template APK v${{ env.VERSION_TAG }}
+          
+          ### ✨ テンプレート機能
+          - 📱 PWA→APK変換テンプレート
+          - 🎨 レスポンシブUI設計
+          - 💾 LocalStorage自動保存
+          - ⚙️ 設定システム完備
+          - 🔄 Service Worker対応
+          
+          ### 🛠️ 開発環境
+          - Node.js ${{ env.NODE_VERSION }}
+          - Java JDK ${{ env.JAVA_VERSION }}
+          - Capacitor 5.x
+          - GitHub Actions自動ビルド
+          
+          ### 📋 使用方法
+          1. このテンプレートをフォーク/クローン
+          2. `npm install` で依存関係インストール
+          3. `npm run dev` で開発開始
+          4. GitHubにプッシュで自動APK生成
+          
+          **APKファイル**: PWA-Template-APK-${{ env.VERSION_TAG }}
+        draft: false
+        prerelease: false
+
+    - name: Build Summary
+      run: |
+        echo "## 🎯 PWA Template APK Build Summary" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "| 項目 | 値 |" >> $GITHUB_STEP_SUMMARY
+        echo "|------|-----|" >> $GITHUB_STEP_SUMMARY
+        echo "| バージョン | ${{ env.VERSION_TAG }} |" >> $GITHUB_STEP_SUMMARY
+        echo "| Node.js | ${{ env.NODE_VERSION }} |" >> $GITHUB_STEP_SUMMARY
+        echo "| Java JDK | ${{ env.JAVA_VERSION }} |" >> $GITHUB_STEP_SUMMARY
+        echo "| ブランチ | ${{ github.ref_name }} |" >> $GITHUB_STEP_SUMMARY
+        echo "| コミット | ${{ github.sha }} |" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "### 📦 成果物" >> $GITHUB_STEP_SUMMARY
+        echo "- APKファイル: \`pwatemplate_${{ env.VERSION_TAG }}.apk\`" >> $GITHUB_STEP_SUMMARY
+        echo "- アーティファクト: PWA-Template-APK-${{ env.VERSION_TAG }}" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "🚀 **APKビルドが正常に完了しました！**" >> $GITHUB_STEP_SUMMARY

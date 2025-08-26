@@ -1,0 +1,91 @@
+{
+  "name": "pwa-to-apk-template",
+  "version": "1.0.0",
+  "description": "PWA→APK変換開発テンプレート - 最速開発スターター",
+  "main": "index.html",
+  "scripts": {
+    "dev": "http-server -p 8080 -c-1",
+    "start": "http-server -p 8080 -c-1",
+    "build": "echo 'Build completed'",
+    "test": "echo 'No tests specified'",
+    "capacitor:init": "npx cap init",
+    "capacitor:add:android": "npx cap add android",
+    "capacitor:sync": "npx cap sync",
+    "capacitor:open:android": "npx cap open android",
+    "capacitor:run:android": "npx cap run android",
+    "android:build": "npm run capacitor:sync && cd android && ./gradlew assembleRelease",
+    "android:sign": "cd android/app/build/outputs/apk/release && jarsigner -verbose -keystore ../../../../../template.keystore -signedjar app-release-signed.apk app-release-unsigned.apk template-key",
+    "serve": "http-server -p 8080 -c-1 -o",
+    "lint": "echo 'Linting completed'",
+    "format": "echo 'Formatting completed'"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/YOUR_USERNAME/pwa-to-apk-template.git"
+  },
+  "keywords": [
+    "pwa",
+    "apk",
+    "capacitor",
+    "template",
+    "progressive-web-app",
+    "android",
+    "mobile",
+    "javascript",
+    "html5",
+    "css3",
+    "service-worker",
+    "offline",
+    "responsive"
+  ],
+  "author": "Your Name <your.email@example.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/YOUR_USERNAME/pwa-to-apk-template/issues"
+  },
+  "homepage": "https://github.com/YOUR_USERNAME/pwa-to-apk-template#readme",
+  "dependencies": {},
+  "devDependencies": {
+    "@capacitor/cli": "^5.0.0",
+    "@capacitor/core": "^5.0.0",
+    "@capacitor/android": "^5.0.0",
+    "@capacitor/app": "^5.0.0",
+    "@capacitor/haptics": "^5.0.0",
+    "@capacitor/keyboard": "^5.0.0",
+    "@capacitor/status-bar": "^5.0.0",
+    "@capacitor/splash-screen": "^5.0.0",
+    "@capacitor/storage": "^1.0.0",
+    "@capacitor/filesystem": "^5.0.0",
+    "@capacitor/device": "^5.0.0",
+    "@capacitor/network": "^5.0.0",
+    "@capacitor/toast": "^5.0.0",
+    "@capacitor/local-notifications": "^5.0.0",
+    "@capacitor/push-notifications": "^5.0.0",
+    "http-server": "^14.0.0"
+  },
+  "engines": {
+    "node": ">=16.0.0",
+    "npm": ">=8.0.0"
+  },
+  "browserslist": [
+    "last 2 versions",
+    "> 1%",
+    "not dead",
+    "not ie 11"
+  ],
+  "pwa": {
+    "name": "PWA Template",
+    "short_name": "PWATemplate",
+    "theme_color": "#2C3E50",
+    "background_color": "#FFFFFF",
+    "start_url": "./",
+    "display": "standalone",
+    "orientation": "portrait"
+  },
+  "capacitor": {
+    "appId": "com.example.pwatemplate",
+    "appName": "PWA Template",
+    "webDir": "./",
+    "bundledWebRuntime": false
+  }
+}

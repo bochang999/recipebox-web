@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>PWA Template</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#2C3E50">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    
+    <!-- PWA Icons -->
+    <link rel="apple-touch-icon" sizes="180x180" href="icons/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="icons/favicon-16x16.png">
+    
+    <!-- Capacitor プラグイン読み込み (APK環境での動作確保) -->
+    <script>
+        // APK環境でのCapacitor検出
+        if (typeof window.Capacitor !== 'undefined') {
+            // ネイティブ環境では自動的に利用可能
+            console.log('✅ ネイティブCapacitor環境検出');
+        } else {
+            // Web環境でのみCDN読み込み
+            console.log('🌐 Web環境でCapacitor CDN読み込み');
+            document.write('<script src="https://unpkg.com/@capacitor/core@7/dist/capacitor.js"><\/script>');
+        }
+    </script>
+</head>
+<body>
+    <div class="app-container">
+        <!-- ヘッダー -->
+        <header class="app-header">
+            <div class="header-title">
+                <h1>🚀 PWA Template</h1>
+                <div class="current-time" id="currentTime"></div>
+            </div>
+            <div class="header-actions">
+                <button class="header-btn" onclick="app.showSettings()">⚙️ 設定</button>
+            </div>
+        </header>
+
+        <!-- メインコンテンツエリア -->
+        <main id="main-content" class="main-content">
+            
+            <!-- Welcome Section -->
+            <section class="welcome-section card">
+                <h2>🎯 PWA→APK 開発テンプレート</h2>
+                <p>このテンプレートを使用して、PWAからAPKへの変換開発を最速で始められます。</p>
+                
+                <div class="feature-grid">
+                    <div class="feature-item">
+                        <div class="feature-icon">📱</div>
+                        <div class="feature-title">PWA対応</div>
+                        <div class="feature-desc">オフライン動作・インストール可能</div>
+                    </div>
+                    
+                    <div class="feature-item">
+                        <div class="feature-icon">📦</div>
+                        <div class="feature-title">APK自動ビルド</div>
+                        <div class="feature-desc">GitHub Actions自動化済み</div>
+                    </div>
+                    
+                    <div class="feature-item">
+                        <div class="feature-icon">🎨</div>
+                        <div class="feature-title">レスポンシブUI</div>
+                        <div class="feature-desc">モバイル・デスクトップ対応</div>
+                    </div>
+                    
+                    <div class="feature-item">
+                        <div class="feature-icon">⚙️</div>
+                        <div class="feature-title">設定システム</div>
+                        <div class="feature-desc">LocalStorage自動保存</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- サンプル機能エリア -->
+            <section class="sample-section">
+                
+                <!-- サンプルカウンター -->
+                <div class="sample-card card">
+                    <h3>📊 サンプル機能: カウンター</h3>
+                    <div class="counter-display">
+                        <div class="counter-value" id="counterValue">0</div>
+                        <div class="counter-controls">
+                            <button class="btn btn-primary" onclick="app.incrementCounter()">+1</button>
+                            <button class="btn btn-secondary" onclick="app.decrementCounter()">-1</button>
+                            <button class="btn btn-danger" onclick="app.resetCounter()">リセット</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- データ管理サンプル -->
+                <div class="data-card card">
+                    <h3>💾 データ管理サンプル</h3>
+                    <div class="data-controls">
+                        <button class="btn btn-primary" onclick="app.saveData()">データ保存</button>
+                        <button class="btn btn-secondary" onclick="app.loadData()">データ読み込み</button>
+                        <button class="btn btn-danger" onclick="app.clearData()">データクリア</button>
+                    </div>
+                    <div class="data-status" id="dataStatus">データなし</div>
+                </div>
+
+            </section>
+
+        </main>
+
+        <!-- 設定モーダル -->
+        <div id="settingsModal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>⚙️ アプリ設定</h3>
+                    <button class="modal-close" onclick="app.hideSettings()">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="settings-section">
+                        <h4>基本設定</h4>
+                        
+                        <div class="form-group">
+                            <label>アプリ名</label>
+                            <input type="text" id="settingAppName" value="PWA Template" placeholder="アプリ名を入力">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>テーマカラー</label>
+                            <select id="settingTheme">
+                                <option value="default">デフォルト</option>
+                                <option value="dark">ダーク</option>
+                                <option value="light">ライト</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>データ自動保存</label>
+                            <input type="checkbox" id="settingAutoSave" checked>
+                        </div>
+                    </div>
+                    
+                    <div class="settings-actions">
+                        <button class="btn btn-primary" onclick="app.saveSettings()">設定を保存</button>
+                        <button class="btn btn-secondary" onclick="app.resetSettings()">デフォルトに戻す</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+    
+    <footer style="text-align: center; padding: 10px; border-top: 1px solid #ccc; font-size: 12px; color: #888;">
+        PWA→APK Template Ver. 1.0 - 開発テンプレート
+    </footer>
+
+    <script src="script.js"></script>
+    
+    <!-- APK Status Bar初期化 -->
+    <script>
+        // APK環境でのStatus Bar設定
+        document.addEventListener('DOMContentLoaded', async function() {
+            if (window.Capacitor && window.Capacitor.isNativePlatform()) {
+                try {
+                    console.log('🔧 APK Status Bar初期化開始');
+                    
+                    // Status Barプラグインが利用可能な場合のみ実行
+                    if (window.Capacitor.Plugins.StatusBar) {
+                        await window.Capacitor.Plugins.StatusBar.setStyle({
+                            style: 'DARK'
+                        });
+                        await window.Capacitor.Plugins.StatusBar.setBackgroundColor({
+                            color: '#2C3E50'
+                        });
+                        await window.Capacitor.Plugins.StatusBar.setOverlaysWebView({
+                            overlay: false
+                        });
+                        console.log('✅ APK Status Bar設定完了');
+                    }
+                } catch (error) {
+                    console.log('⚠️ Status Bar設定失敗:', error);
+                }
+            }
+        });
+    </script>
+    
+    <!-- Service Worker登録 (PWA対応) -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', function() {
+                navigator.serviceWorker.register('./sw.js')
+                    .then(function(registration) {
+                        console.log('✅ Service Worker登録成功:', registration.scope);
+                    })
+                    .catch(function(error) {
+                        console.log('❌ Service Worker登録失敗:', error);
+                    });
+            });
+        }
+    </script>
+</body>
+</html>
