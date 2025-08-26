@@ -68,7 +68,7 @@ jobs:
         run: |
           if [ ! -z "$KEYSTORE_FILE" ] && [ "$KEYSTORE_FILE" != "ZHVtbXkta2V5c3RvcmUtY29udGVudAo=" ]; then
             echo "Real keystore found, decoding..."
-            echo "$KEYSTORE_FILE" | base64 --decode > android/app/keystore.jks
+            echo "$KEYSTORE_FILE" | base64 --decode > android/keystore.jks
             echo "KEYSTORE_EXISTS=true" >> $GITHUB_ENV
           else
             echo "No valid keystore found, will use debug signing"
