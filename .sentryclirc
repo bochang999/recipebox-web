@@ -1,0 +1,7 @@
+[defaults]
+url=https://sentry.io/
+org=YOUR_ORG_SLUG
+project=recipebox-web
+
+[auth]
+token=YOUR_AUTH_TOKEN

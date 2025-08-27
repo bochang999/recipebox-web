@@ -1,5 +1,14 @@
 // RecipeBox Web App JavaScript
 
+// Sentry初期化
+import * as Sentry from "@sentry/capacitor";
+
+Sentry.init({
+    dsn: "YOUR_DSN_HERE", // 実際のDSNに置き換える必要があります
+    debug: true,
+    environment: "production"
+});
+
 class RecipeBoxApp {
     constructor() {
         this.currentScreen = 'main-screen';
@@ -2081,6 +2090,16 @@ class RecipeBoxApp {
         window.addEventListener('beforeinstallprompt', (e) => {
             console.log('PWA install prompt available');
             // TODO: インストールボタンの表示
+        });
+    }
+
+    // Sentryエラーハンドリング（本番用）
+    handleError(error, context = 'Unknown') {
+        console.error(`RecipeBox Error [${context}]:`, error);
+        Sentry.captureException(error, {
+            tags: {
+                component: context
+            }
         });
     }
 
