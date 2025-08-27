@@ -5,3 +5,6 @@ project=recipebox-web
 
 [auth]
 token=YOUR_AUTH_TOKEN
+
+# 注意: 実際のトークンを設定後、このファイルが.gitignoreに含まれていることを確認してください
+# 本番環境では環境変数 SENTRY_AUTH_TOKEN を使用することを推奨します

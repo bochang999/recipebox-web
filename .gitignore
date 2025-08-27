@@ -1,0 +1,27 @@
+# Dependencies
+node_modules/
+npm-debug.log*
+
+# Production builds
+dist/
+build/
+
+# Environment variables (CRITICAL: 絶対にコミットしない)
+.env
+.env.local
+.env.production
+
+# Sentry configuration (機密情報含む)
+.sentryclirc
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Editor files
+.vscode/
+.idea/
+
+# Capacitor
+android/
+ios/

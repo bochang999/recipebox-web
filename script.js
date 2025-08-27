@@ -3,11 +3,14 @@
 // Sentry初期化
 import * as Sentry from "@sentry/capacitor";
 
-Sentry.init({
-    dsn: "YOUR_DSN_HERE", // 実際のDSNに置き換える必要があります
+// 環境変数から設定値を取得 (ビルド時に置換される)
+const SENTRY_CONFIG = {
+    dsn: window.SENTRY_DSN || "YOUR_DSN_HERE",
     debug: true,
     environment: "production"
-});
+};
+
+Sentry.init(SENTRY_CONFIG);
 
 class RecipeBoxApp {
     constructor() {
