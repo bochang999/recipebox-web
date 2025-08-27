@@ -1498,31 +1498,39 @@ class RecipeBoxApp {
         this.recipes = originalRecipes;
     }
 
-    setSortMode(mode) {
-        // タブの状態更新
+    setSortMode(sortType) {
+        // アクティブタブの更新
         document.querySelectorAll('.sort-tab').forEach(tab => {
             tab.classList.remove('active');
         });
-        document.querySelector(`[data-sort="${mode}"]`).classList.add('active');
+        document.querySelector(`[data-sort="${sortType}"]`).classList.add('active');
 
         // ソート実行
-        switch (mode) {
+        switch (sortType) {
             case 'time':
-                this.recipes.sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
+                this.recipes.sort((a, b) => {
+                    return new Date(b.updatedAt) - new Date(a.updatedAt);
+                });
                 break;
             case 'name':
-                this.recipes.sort((a, b) => a.name.localeCompare(b.name));
+                this.recipes.sort((a, b) => {
+                    return a.name.localeCompare(b.name, 'ja');
+                });
                 break;
             case 'popular':
                 this.recipes.sort((a, b) => {
                     const aViews = a.viewCount || 0;
                     const bViews = b.viewCount || 0;
-                    if (bViews !== aViews) return bViews - aViews; // 閲覧回数降順
-                    return new Date(b.updatedAt) - new Date(a.updatedAt); // 同じ場合は更新日時順
+                    if (bViews !== aViews) {
+                        return bViews - aViews; // 閲覧数降順
+                    }
+                    // 閲覧数が同じ場合は更新日時順
+                    return new Date(b.updatedAt) - new Date(a.updatedAt);
                 });
                 break;
         }
-        
+
+        // レンダリング
         this.renderRecipes();
     }
 
