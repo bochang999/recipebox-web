@@ -5,8 +5,7 @@
   "main": "script.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "mkdir -p dist && cp index.html style.css script.js manifest.json sw.js dist/",
-    "build:production": "npm run build && npx sentry-cli releases files $npm_package_version upload-sourcemaps dist/"
+    "build": "mkdir -p dist && cp index.html style.css script.js manifest.json sw.js dist/"
   },
   "keywords": [],
   "author": "",
@@ -14,13 +13,13 @@
   "dependencies": {
     "@capacitor/android": "^7.4.2",
     "@capacitor/core": "^7.4.2",
-    "@sentry/capacitor": "^2.2.0",
-    "@sentry/wizard": "^6.3.0",
     "sharp": "^0.34.3"
   },
   "devDependencies": {
     "@biomejs/biome": "^2.2.2",
     "@capacitor/cli": "^7.4.2",
+    "eslint": "^9.34.0",
+    "eslint_d": "^14.3.0",
     "vscode-langservers-extracted": "^4.10.0"
   }
 }

@@ -1,16 +1,25 @@
 // RecipeBox Web App JavaScript
 
-// Sentry初期化
-import * as Sentry from "@sentry/capacitor";
+// Sentry初期化 (一時的に無効化)
+// import * as Sentry from '@sentry/capacitor';
 
 // 環境変数から設定値を取得 (ビルド時に置換される)
-const SENTRY_CONFIG = {
-    dsn: window.SENTRY_DSN || "YOUR_DSN_HERE",
-    debug: true,
-    environment: "production"
+// const SENTRY_CONFIG = {
+//     dsn: window.SENTRY_DSN || 'YOUR_DSN_HERE',
+//     debug: true,
+//     environment: 'production'
+// };
+
+// Sentry.init(SENTRY_CONFIG);
+
+// 一時的なSentryモック
+const Sentry = {
+    captureException: (error, options) => {
+        console.error('Sentry (Mock):', error, options);
+    }
 };
 
-Sentry.init(SENTRY_CONFIG);
+// Script.js loaded - Sentry disabled for browser compatibility
 
 class RecipeBoxApp {
     constructor() {
