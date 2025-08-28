@@ -1,25 +1,45 @@
 // RecipeBox Web App JavaScript
 
-// Sentry初期化 (一時的に無効化)
-// import * as Sentry from '@sentry/capacitor';
+// Sentry初期化 (CDN経由で安全に読み込み)
+let Sentry;
 
-// 環境変数から設定値を取得 (ビルド時に置換される)
-// const SENTRY_CONFIG = {
-//     dsn: window.SENTRY_DSN || 'YOUR_DSN_HERE',
-//     debug: true,
-//     environment: 'production'
-// };
+// Sentryの動的読み込み (APKビルドでは無視される)
+if (typeof window !== 'undefined' && window.Capacitor) {
+    // Capacitor環境でのSentry初期化
+    import('@sentry/capacitor').then(sentryModule => {
+        Sentry = sentryModule;
+        initializeSentry();
+    }).catch(err => {
+        console.warn('Sentry failed to load:', err);
+        Sentry = createSentryMock();
+    });
+} else {
+    // ブラウザ環境では一時的にモックを使用
+    Sentry = createSentryMock();
+}
 
-// Sentry.init(SENTRY_CONFIG);
+function createSentryMock() {
+    return {
+        captureException: (error, options) => {
+            console.error('Error (Sentry Mock):', error, options);
+            // 本番環境ではこのエラーをサーバーに送信することも可能
+        },
+        init: () => console.log('Sentry mock initialized')
+    };
+}
 
-// 一時的なSentryモック
-const Sentry = {
-    captureException: (error, options) => {
-        console.error('Sentry (Mock):', error, options);
+function initializeSentry() {
+    if (Sentry && Sentry.init) {
+        Sentry.init({
+            dsn: window.SENTRY_DSN || 'YOUR_DSN_HERE',
+            debug: false,
+            environment: 'production'
+        });
+        console.log('Sentry initialized successfully');
     }
-};
+}
 
-// Script.js loaded - Sentry disabled for browser compatibility
+// RecipeBox App with dynamic Sentry loading
 
 class RecipeBoxApp {
     constructor() {
