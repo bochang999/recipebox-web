@@ -1,7 +1,7 @@
 // RecipeBox Web App JavaScript
 
-// Sentry初期化 (ブラウザテスト時はコメントアウト)
-// import * as Sentry from "@sentry/capacitor";
+// Sentry初期化
+import * as Sentry from "@sentry/capacitor";
 
 // 環境変数から設定値を取得 (ビルド時に置換される)
 const SENTRY_CONFIG = {
@@ -10,7 +10,7 @@ const SENTRY_CONFIG = {
     environment: "production"
 };
 
-// Sentry.init(SENTRY_CONFIG);
+Sentry.init(SENTRY_CONFIG);
 
 class RecipeBoxApp {
     constructor() {
@@ -2107,11 +2107,11 @@ class RecipeBoxApp {
     // Sentryエラーハンドリング（本番用）
     handleError(error, context = 'Unknown') {
         console.error(`RecipeBox Error [${context}]:`, error);
-        // Sentry.captureException(error, {
-        //     tags: {
-        //         component: context
-        //     }
-        // });
+        Sentry.captureException(error, {
+            tags: {
+                component: context
+            }
+        });
     }
 
 }

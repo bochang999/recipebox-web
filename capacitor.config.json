@@ -1,5 +1,11 @@
 {
   "appId": "com.bochang.recipebox",
   "appName": "RecipeBox",
-  "webDir": "dist"
+  "webDir": "dist",
+  "android": {
+    "webContentsDebuggingEnabled": true,
+    "webContents": {
+      "clearCache": true
+    }
+  }
 }

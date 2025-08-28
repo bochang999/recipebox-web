@@ -33,9 +33,7 @@ jobs:
         run: npm ci
 
       - name: Build web assets
-        run: |
-          mkdir -p dist
-          cp index.html style.css script.js manifest.json sw.js dist/
+        run: npm run build
 
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
