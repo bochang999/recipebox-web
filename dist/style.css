@@ -68,35 +68,33 @@ body {
 .menu-button {
     display: flex;
     align-items: center;
+    justify-content: center;
     background: white;
     border: 2px solid #e0e0e0;
     border-radius: 12px;
-    padding: 20px;
+    padding: 24px 20px;
     font-size: 18px;
     font-weight: 500;
     color: #333;
     cursor: pointer;
     transition: all 0.2s ease;
     box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    text-align: center;
 }
 
 .menu-button:hover {
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(0,0,0,0.15);
     border-color: #2196F3;
+    background: #f8f9ff;
 }
 
 .menu-button:active {
     transform: translateY(0);
 }
 
-.menu-icon {
-    font-size: 24px;
-    margin-right: 15px;
-}
-
 .menu-text {
-    flex: 1;
+    font-weight: 600;
 }
 
 /* 各画面のヘッダー */
@@ -156,6 +154,7 @@ body {
 .screen-content {
     flex: 1;
     padding: 20px;
+    padding-bottom: 40px; /* 適切な下部余白 */
     overflow-y: auto;
 }
 
@@ -582,4 +581,290 @@ button, .menu-button {
     font-size: 14px;
     color: #555;
     margin-top: 4px;
+}
+
+/* 改善された塩分濃度計算機のスタイル */
+.calc-step {
+    margin-bottom: 25px;
+    padding: 15px 0;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.calc-step:last-of-type {
+    border-bottom: none;
+}
+
+.calc-step h3 {
+    color: #333;
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+}
+
+.calc-step h3::before {
+    content: "";
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: #2196F3;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 600;
+    margin-right: 10px;
+}
+
+.calc-step:nth-child(1) h3::before {
+    content: "1";
+}
+
+.calc-step:nth-child(2) h3::before {
+    content: "2";
+}
+
+/* 改善された計算結果スタイル */
+.salt-calc-result {
+    margin-top: 20px;
+    padding: 20px;
+    background: linear-gradient(135deg, #e3f2fd 0%, #f0f8ff 100%);
+    border-radius: 12px;
+    border: 2px solid #2196F3;
+    text-align: center;
+    display: none;
+}
+
+.salt-calc-result.show {
+    display: block;
+    animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.result-main {
+    font-size: 24px;
+    font-weight: 700;
+    color: #1976D2;
+    margin-bottom: 8px;
+}
+
+.result-detail {
+    font-size: 14px;
+    color: #555;
+    line-height: 1.4;
+}
+
+/* レシピフォームスタイル */
+.recipe-form {
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.form-section {
+    background: white;
+    border-radius: 12px;
+    border: 1px solid #e0e0e0;
+    margin-bottom: 20px;
+    padding: 20px;
+}
+
+.form-section h3 {
+    margin: 0 0 20px 0;
+    color: #333;
+    font-size: 18px;
+    font-weight: 600;
+    border-bottom: 2px solid #f0f0f0;
+    padding-bottom: 10px;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 500;
+    color: #555;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+    width: 100%;
+    padding: 12px;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    font-size: 16px;
+    transition: border-color 0.2s;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+    outline: none;
+    border-color: #2196F3;
+}
+
+.form-group textarea {
+    resize: vertical;
+    font-family: inherit;
+}
+
+/* 材料・手順入力 */
+.ingredient-input,
+.step-input {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+    padding: 10px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    border: 1px solid #e0e0e0;
+}
+
+.ingredient-input input {
+    flex: 1;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    margin-bottom: 0;
+}
+
+.ingredient-name {
+    flex: 2;
+}
+
+.ingredient-amount {
+    flex: 0.8;
+    width: auto !important;
+}
+
+.ingredient-unit {
+    flex: 0.6;
+    width: auto !important;
+}
+
+.ingredient-note {
+    flex: 1.5;
+}
+
+.step-input {
+    align-items: flex-start;
+}
+
+.step-number {
+    background: #2196F3;
+    color: white;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 600;
+    flex-shrink: 0;
+    margin-top: 8px;
+}
+
+.step-text {
+    flex: 1;
+    min-height: 50px;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    resize: vertical;
+    font-family: inherit;
+}
+
+.remove-ingredient,
+.remove-step {
+    background: #ff5722;
+    color: white;
+    border: none;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: bold;
+    transition: background 0.2s;
+    flex-shrink: 0;
+}
+
+.remove-ingredient:hover,
+.remove-step:hover {
+    background: #d32f2f;
+}
+
+.add-button {
+    background: #4caf50;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    transition: background 0.2s;
+    margin-top: 10px;
+}
+
+.add-button:hover {
+    background: #45a049;
+}
+
+/* チェックボックス */
+.form-group label input[type="checkbox"] {
+    width: auto;
+    margin-right: 8px;
+    transform: scale(1.2);
+}
+
+/* レスポンシブ */
+@media (max-width: 480px) {
+    .form-row {
+        grid-template-columns: 1fr;
+        gap: 10px;
+    }
+    
+    .ingredient-input,
+    .step-input {
+        flex-wrap: wrap;
+        gap: 5px;
+    }
+    
+    .ingredient-input input {
+        min-width: 120px;
+    }
+    
+    .step-input {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .step-number {
+        align-self: flex-start;
+        margin-bottom: 5px;
+    }
 }

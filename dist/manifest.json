@@ -49,6 +49,10 @@
       "type": "image/png"
     }
   ],
-  "categories": ["food", "utilities", "lifestyle"],
+  "categories": [
+    "food",
+    "utilities",
+    "lifestyle"
+  ],
   "lang": "ja"
 }
