@@ -1,27 +1,46 @@
-# RecipeBox Web版
+# RecipeBox Web 🍳
 
-## 概要
-分量調整と塩分濃度計算ができるシンプルな料理レシピ管理Webアプリ
+PWA recipe management app with CCLSP integration for advanced code analysis.
 
-## 特徴
-- **PWA対応**: アプリとしてインストール可能
-- **オフライン動作**: Service Workerによるキャッシュ機能
-- **レスポンシブデザイン**: スマホ・タブレット・PC対応
-- **LocalStorage**: ブラウザ内でのデータ永続化
+## 🚀 Quick Start with GitHub Codespaces
 
-## 機能
-- 料理レシピ管理（追加・編集・検索・ソート）
-- 分量調整（1-4人前スライダー）
-- 塩分濃度計算機
-- 容器重量データ参照
-- 星マーク（お気に入り）機能
+### Option 1: One-Click Launch (Recommended)
+[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/bochang999/recipebox-web)
 
-## 開発・テスト
+### Option 2: Manual Launch
+1. Go to: https://github.com/bochang999/recipebox-web
+2. Click green `< > Code` button
+3. Select `Codespaces` tab
+4. Click `Create codespace on main`
+
+## ✨ Features
+- **Recipe Management**: Create, edit, and organize recipes
+- **Amount Calculator**: 1-4 servings adjustment slider
+- **Salt Concentration Calculator**: Precise seasoning calculations
+- **PWA Support**: Install as mobile app
+- **CCLSP Integration**: Advanced code analysis with Language Server Protocol
+
+## 🔧 Development Environment
+
+The Codespace automatically sets up:
+- Node.js 18+ environment
+- TypeScript Language Server (fast initialization in cloud!)
+- CCLSP with MCP integration
+- Development server on port 8080
+
+## 🎯 CCLSP Usage
+
+Once in Codespaces, you can use powerful code analysis tools:
+
 ```bash
-# 開発サーバー起動
-http-server -p 8080 -o
+# Test CCLSP connection
+cclsp --version
 
-# ブラウザで http://localhost:8080 にアクセス
+# Use MCP tools through Claude Code
+# - find_definition: Locate function/variable definitions
+# - find_references: Find all usage locations  
+# - rename_symbol: Refactor variable names
+# - get_diagnostics: Check for errors and warnings
 ```
 
 ## PWAインストール
