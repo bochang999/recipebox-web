@@ -120,7 +120,8 @@ class RecipeBoxApp {
 
     // レシピ関連
     loadRecipes() {
-        const stored = localStorage.getItem('recipebox-recipes');
+        // BOC-32: バージョン付きキーでキャッシュ無効化
+        const stored = localStorage.getItem('recipebox-recipes-v2.0');
         if (stored) {
             return JSON.parse(stored);
         }
@@ -1436,7 +1437,8 @@ class RecipeBoxApp {
     }
 
     saveRecipes() {
-        localStorage.setItem('recipebox-recipes', JSON.stringify(this.recipes));
+        // BOC-32: バージョン付きキーでキャッシュ無効化
+        localStorage.setItem('recipebox-recipes-v2.0', JSON.stringify(this.recipes));
     }
 
     renderRecipes() {
