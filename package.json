@@ -19,6 +19,8 @@
     "sharp": "^0.34.3"
   },
   "devDependencies": {
-    "@capacitor/cli": "^7.4.2"
+    "@biomejs/biome": "^2.2.2",
+    "@capacitor/cli": "^7.4.2",
+    "vscode-langservers-extracted": "^4.10.0"
   }
 }

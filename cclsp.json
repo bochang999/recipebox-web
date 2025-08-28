@@ -1,9 +1,11 @@
 {
   "servers": [
     {
-      "extensions": ["js", "ts", "jsx", "tsx"],
-      "command": ["typescript-language-server", "--stdio"],
-      "rootDir": "."
+      "extensions": ["js"],
+      "command": ["./node_modules/.bin/vscode-json-language-server", "--stdio"],
+      "rootDir": ".",
+      "timeout": 10000,
+      "maxRetries": 1
     }
   ]
 }
