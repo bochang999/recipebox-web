@@ -138,14 +138,26 @@ jobs:
           MINOR_VERSION=$(printf "%02d" ${{ github.run_number }})
           VERSION="v${MAJOR_VERSION}.${MINOR_VERSION}"
           
-          if [ "$KEYSTORE_EXISTS" = "true" ] && [ -f android/app/build/outputs/apk/release/app-release.apk ]; then
+          echo "=== APK File Detection ==="
+          find android/app/build/outputs/apk/ -name "*.apk" -type f || echo "No APK files found"
+          ls -la android/app/build/outputs/apk/*/ 2>/dev/null || echo "APK output directories not found"
+          
+          # APKファイル検出と選択
+          if [ -f android/app/build/outputs/apk/release/app-release.apk ]; then
+            echo "✅ Release APK found"
             cp android/app/build/outputs/apk/release/app-release.apk "RecipeBox-${VERSION}.apk"
             echo "APK_FILE=RecipeBox-${VERSION}.apk" >> $GITHUB_ENV
             echo "VERSION=${VERSION}" >> $GITHUB_ENV
-          else
+          elif [ -f android/app/build/outputs/apk/debug/app-debug.apk ]; then
+            echo "✅ Debug APK found (fallback)"
             cp android/app/build/outputs/apk/debug/app-debug.apk "RecipeBox-${VERSION}.apk"
             echo "APK_FILE=RecipeBox-${VERSION}.apk" >> $GITHUB_ENV
             echo "VERSION=${VERSION}" >> $GITHUB_ENV
+          else
+            echo "❌ No APK files found in expected locations"
+            echo "Available files in android/app/build/outputs/:"
+            find android/app/build/outputs/ -name "*.apk" -type f 2>/dev/null || echo "No APK files found anywhere"
+            exit 1
           fi
 
       - name: Upload APK
