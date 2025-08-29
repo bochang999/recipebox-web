@@ -47,8 +47,26 @@ jobs:
       - name: Resize Recipe Icon to Android Densities
         run: python3 use_provided_icon.py
 
-      - name: Sync Capacitor
-        run: npx cap sync android
+      - name: Initialize Capacitor Android Platform
+        run: |
+          # Android プラットフォーム初期化（gradlew生成）
+          echo "=== Initializing Capacitor Android Platform ==="
+          npx cap add android
+          
+          # gradlew生成確認（デバッグ）
+          if [ -f "android/gradlew" ]; then
+            echo "✅ gradlew generated successfully"
+            ls -la android/gradlew
+          else
+            echo "❌ gradlew generation failed"
+            exit 1
+          fi
+          
+          # Web資産同期
+          echo "=== Syncing Web Assets to Android ==="
+          npx cap sync android
+          
+          echo "=== Android Platform Ready ===
 
       - name: Cache Gradle packages
         uses: actions/cache@v4
