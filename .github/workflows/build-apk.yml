@@ -1,0 +1,123 @@
+name: Build Signed Android APK
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Setup Java JDK
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Build Web Assets
+        run: npm run build
+
+      - name: Decode and Verify Keystore
+        id: decode_keystore
+        env:
+          KEYSTORE_BASE64: ${{ secrets.KEYSTORE_FILE }}
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+        run: |
+          if [ -z "$KEYSTORE_BASE64" ]; then
+            echo "❌ KEYSTORE_FILE secret is not set."
+            exit 1
+          fi
+          
+          echo "Decoding keystore..."
+          # ワークスペースのルートにキーストアファイルを配置
+          KEYSTORE_PATH="${{ github.workspace }}/keystore.jks"
+          echo "$KEYSTORE_BASE64" | base64 --decode > $KEYSTORE_PATH
+          
+          echo "Verifying keystore..."
+          # keytoolでキーストアが有効かチェック。失敗したら即座に終了
+          keytool -list -keystore $KEYSTORE_PATH -storepass "$KEYSTORE_PASSWORD" || exit 1
+          
+          echo "✅ Keystore is valid."
+          # 後続のステップでパスを使えるように出力に設定
+          echo "keystore_path=$KEYSTORE_PATH" >> $GITHUB_OUTPUT
+
+      - name: Initialize Clean Android Platform and Sync
+        run: |
+          # 冪等性を保証するため、既存のandroidディレクトリがあれば完全に削除する
+          if [ -d "android" ]; then
+            echo "⚠️ Removing existing android/ directory for a clean build..."
+            rm -rf android/
+          fi
+          
+          # クリーンな状態でAndroidプラットフォームを追加（ここでgradlewが生成される）
+          echo "📁 Creating a fresh Android platform..."
+          npx cap add android
+          
+          # Web資産をAndroidプラットフォームに同期
+          echo "🔄 Syncing web assets..."
+          npx cap sync android
+          echo "✅ Android Platform is ready."
+          ls -la android/
+
+      - name: Build Signed Android APK
+        working-directory: ./android
+        env:
+          # 前のステップで検証したキーストアのパスを環境変数として渡す
+          KEYSTORE_FILE: ${{ steps.decode_keystore.outputs.keystore_path }}
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+        run: |
+          echo "=== Starting Gradle build with signing config ==="
+          chmod +x gradlew
+          # --stacktraceオプションでエラー発生時に詳細なログを出力
+          ./gradlew assembleRelease --stacktrace
+
+      - name: Rename and Prepare Release APK
+        id: rename_apk
+        run: |
+          echo "Searching for signed APK..."
+          # 署名済みAPKのパスを特定
+          SIGNED_APK_PATH=$(find android/app/build/outputs/apk/release -name "app-release.apk" -type f)
+          if [ -z "$SIGNED_APK_PATH" ]; then
+            echo "❌ Signed APK (app-release.apk) not found!"
+            echo "Listing available APKs in release directory:"
+            find android/app/build/outputs/apk/release -name "*.apk" -type f || echo "No APKs found."
+            exit 1
+          fi
+          # バージョン番号を計算
+          MAJOR_VERSION=1
+          MINOR_VERSION=$(printf "%02d" ${{ github.run_number }})
+          VERSION="v${MAJOR_VERSION}.${MINOR_VERSION}"
+          
+          # 新しいファイル名でコピー
+          NEW_APK_NAME="RecipeBox-${VERSION}.apk"
+          cp "$SIGNED_APK_PATH" "$NEW_APK_NAME"
+          
+          echo "✅ APK successfully renamed to ${NEW_APK_NAME}"
+          
+          # 後続のリリースステップのためにファイル名とバージョンを出力
+          echo "apk_name=${NEW_APK_NAME}" >> $GITHUB_OUTPUT
+          echo "version_tag=${VERSION}" >> $GITHUB_OUTPUT
+
+      - name: Upload APK as Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ steps.rename_apk.outputs.apk_name }}
+          path: ${{ steps.rename_apk.outputs.apk_name }}
+          retention-days: 30
