@@ -49,16 +49,32 @@ jobs:
 
       - name: Initialize Capacitor Android Platform
         run: |
-          # Android プラットフォーム初期化（gradlew生成）
-          echo "=== Initializing Capacitor Android Platform ==="
+          echo "=== Android Platform Clean Initialization ==="
+          
+          # デバッグ: 現在状態確認
+          echo "📊 Current directory structure:"
+          ls -la
+          
+          # 既存android/ディレクトリ完全削除
+          if [ -d "android" ]; then
+            echo "🗑️ Removing existing android/ directory"
+            rm -rf android/
+          fi
+          
+          # 新規プラットフォーム作成
+          echo "📁 Creating fresh android platform"
           npx cap add android
           
-          # gradlew生成確認（デバッグ）
+          # gradlew生成確認・権限設定
+          echo "🔍 Verifying gradlew generation"
           if [ -f "android/gradlew" ]; then
             echo "✅ gradlew generated successfully"
+            chmod +x android/gradlew
             ls -la android/gradlew
           else
             echo "❌ gradlew generation failed"
+            echo "Android directory contents:"
+            ls -la android/ || echo "android/ directory not found"
             exit 1
           fi
           
@@ -66,7 +82,7 @@ jobs:
           echo "=== Syncing Web Assets to Android ==="
           npx cap sync android
           
-          echo "=== Android Platform Ready ===
+          echo "✅ Android Platform Ready for Build"
 
       - name: Cache Gradle packages
         uses: actions/cache@v4
