@@ -142,10 +142,15 @@ jobs:
           find android/app/build/outputs/apk/ -name "*.apk" -type f || echo "No APK files found"
           ls -la android/app/build/outputs/apk/*/ 2>/dev/null || echo "APK output directories not found"
           
-          # APKファイル検出と選択
+          # APKファイル検出と選択 (unsigned APK対応)
           if [ -f android/app/build/outputs/apk/release/app-release.apk ]; then
-            echo "✅ Release APK found"
+            echo "✅ Signed Release APK found"
             cp android/app/build/outputs/apk/release/app-release.apk "RecipeBox-${VERSION}.apk"
+            echo "APK_FILE=RecipeBox-${VERSION}.apk" >> $GITHUB_ENV
+            echo "VERSION=${VERSION}" >> $GITHUB_ENV
+          elif [ -f android/app/build/outputs/apk/release/app-release-unsigned.apk ]; then
+            echo "⚠️ Unsigned Release APK found (signing failed, using unsigned)"
+            cp android/app/build/outputs/apk/release/app-release-unsigned.apk "RecipeBox-${VERSION}.apk"
             echo "APK_FILE=RecipeBox-${VERSION}.apk" >> $GITHUB_ENV
             echo "VERSION=${VERSION}" >> $GITHUB_ENV
           elif [ -f android/app/build/outputs/apk/debug/app-debug.apk ]; then
