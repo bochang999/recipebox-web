@@ -1,0 +1,11 @@
+{
+  "servers": [
+    {
+      "extensions": ["js", "ts"],
+      "command": ["./node_modules/.bin/vscode-eslint-language-server", "--stdio"],
+      "rootDir": ".",
+      "timeout": 15000,
+      "maxRetries": 2
+    }
+  ]
+}

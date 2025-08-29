@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RecipeBox - 料理レシピ画面テスト</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="app">
+        <!-- 料理レシピ画面 -->
+        <div id="recipes-screen" class="screen active">
+            <header class="screen-header">
+                <h2>料理レシピ</h2>
+            </header>
+            
+            <div class="screen-content">
+                <div class="search-container">
+                    <input type="text" id="recipe-search" placeholder="レシピを検索..." class="search-input">
+                </div>
+                
+                <div class="sort-tabs">
+                    <button class="sort-tab active" data-sort="time">時系列</button>
+                    <button class="sort-tab" data-sort="name">あいうえお順</button>
+                    <button class="sort-tab" data-sort="popular">🔥人気順</button>
+                </div>
+                
+                <div id="recipes-list" class="recipes-list">
+                    <p class="empty-message">レシピがまだありません。「＋追加」でレシピを追加しましょう。</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="config.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
