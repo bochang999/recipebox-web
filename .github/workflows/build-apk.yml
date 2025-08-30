@@ -121,23 +121,21 @@ jobs:
         echo "🔐 キーストア設定完了"
 
     # ========== 4. Capacitor初期化フェーズ ==========
-    - name: Initialize Capacitor Project
+    - name: Build Web Assets and Prepare Capacitor
       run: |
-        echo "🔧 Capacitor初期化開始"
+        echo "🏧️ ウェブアセットビルド開始"
         
-        # 既存Androidディレクトリがある場合は削除（クリーンスタート）
+        # distディレクトリ作成とファイルコピー
+        mkdir -p dist
+        cp index.html style.css script.js manifest.json sw.js config.js dist/
+        
+        # 既存Androidディレクトリ削除（クリーンスタート）
         if [ -d "android" ]; then
           echo "🗑️ 既存Androidディレクトリを削除"
           rm -rf android
         fi
         
-        # プロジェクト初期化（既存設定を使用）
-        npx cap init --web-dir ./
-        
-        # Androidプラットフォーム追加
-        npx cap add android
-        
-        echo "✅ Capacitor初期化完了"
+        echo "✅ ウェブアセット準備完了"
 
     - name: Sync Capacitor Project
       run: |

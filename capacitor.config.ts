@@ -3,7 +3,7 @@ import type { CapacitorConfig } from '@capacitor/cli';
 const config: CapacitorConfig = {
   appId: 'com.bochang.recipebox',
   appName: 'RecipeBox',
-  webDir: '.',
+  webDir: 'dist',
   plugins: {
     StatusBar: {
       style: 'DARK',
