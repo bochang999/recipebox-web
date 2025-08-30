@@ -60,19 +60,11 @@ const config: CapacitorConfig = {
       statusBarStyle: 'dark'
     },
     Device: {},
-    Storage: {},
+    Preferences: {},
     Filesystem: {},
     Network: {},
     Toast: {},
-    Haptics: {},
-    LocalNotifications: {
-      smallIcon: 'ic_stat_notification',
-      iconColor: '#2196F3',
-      sound: null
-    },
-    PushNotifications: {
-      presentationOptions: ['badge', 'sound', 'alert']
-    }
+    Haptics: {}
   },
   cordova: {},
   includePlugins: [
@@ -81,13 +73,11 @@ const config: CapacitorConfig = {
     '@capacitor/keyboard',
     '@capacitor/status-bar',
     '@capacitor/splash-screen',
-    '@capacitor/storage',
+    '@capacitor/preferences',
     '@capacitor/filesystem',
     '@capacitor/device',
     '@capacitor/network',
-    '@capacitor/toast',
-    '@capacitor/local-notifications',
-    '@capacitor/push-notifications'
+    '@capacitor/toast'
   ]
 };
 
