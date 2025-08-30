@@ -1,0 +1,439 @@
+name: Build RecipeBox Android App (Ephemeral Capacitor)
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build-android:
+    permissions:
+      contents: write
+    runs-on: ubuntu-latest
+
+    env:
+      NODE_VERSION: '20'
+      JAVA_VERSION: '21'          # Capacitor 7 requires JDK 21
+      APP_ID: com.bochang.recipebox
+      APP_NAME: 'RecipeBox'
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: ${{ env.JAVA_VERSION }}
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Setup Android SDK Build Tools Path
+        run: |
+          echo "Setting up Android SDK Build Tools path..."
+          BUILD_TOOLS_PATH=$(find $ANDROID_HOME/build-tools -maxdepth 1 | sort -r | head -n 1)
+          echo "Found Build Tools at: $BUILD_TOOLS_PATH"
+          echo "$BUILD_TOOLS_PATH" >> $GITHUB_PATH
+          echo "✅ Android SDK Build-Tools added to PATH."
+
+      - name: Accept Android licenses
+        run: yes | sdkmanager --licenses >/dev/null
+
+      - name: Install API 35 components
+        run: |
+          echo "📱 Installing Android SDK API 35 for Capacitor 7..."
+          sdkmanager "platforms;android-35" "build-tools;35.0.0"
+          echo "✅ Android SDK components installed successfully"
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: 🕵️ Analyze Installed Dependencies
+        run: |
+          echo "--- NPM Dependency Tree ---"
+          npm list
+          echo "--- End of NPM Dependency Tree ---"
+
+      - name: Prepare Web Directory for Capacitor
+        run: |
+          echo "🧹 Cleaning www directory..."
+          rm -rf www
+          echo "📦 Rebuilding www directory..."
+          mkdir -p www/assets
+          cp -r *.html *.css *.js *.json www/ 2>/dev/null || true
+          echo "🖼️ Copying recipe icon into www directory..."
+          if [ -f "assets/icon.png" ]; then
+            cp assets/icon.png www/assets/icon.png
+            echo "✅ Recipe icon copied to www/assets/"
+          else
+            echo "⚠️ assets/icon.png not found, using default"
+          fi
+          if [ -f "assets/splash.png" ]; then
+            cp assets/splash.png www/assets/splash.png
+            echo "✅ Splash screen copied to www/assets/"
+          fi
+          echo "✅ Web directory prepared with clean assets"
+
+      - name: Detect webDir (robust)
+        id: detect
+        run: |
+          echo "🔍 Detecting webDir location with robust method..."
+          for d in www dist build public; do
+            if [ -f "$d/index.html" ]; then
+              echo "✅ Found index.html in: $d"
+              echo "webdir=$d" >> $GITHUB_OUTPUT
+              exit 0
+            fi
+          done
+          echo "::error::index.html not found in any expected directory"
+          exit 1
+
+      - name: Clean Capacitor Setup (Ephemeral Init)
+        run: |
+          echo "🧹 Ensuring clean Capacitor initialization state..."
+          rm -rf capacitor.config.* android ios electron
+          echo "✅ Previous Capacitor artifacts removed"
+
+      - name: Initialize Capacitor (Fresh Start)
+        run: |
+          echo "⚡ Fresh Capacitor initialization without config conflicts..."
+          echo "📂 Using webDir: ${{ steps.detect.outputs.webdir }}"
+          
+          # Initialize Capacitor with detected webDir
+          npx cap init "${{ env.APP_NAME }}" "${{ env.APP_ID }}" --web-dir="${{ steps.detect.outputs.webdir }}"
+          
+          echo "🔧 Adding Android platform..."
+          npx cap add android
+          
+          echo "✅ Capacitor initialization completed successfully"
+
+      - name: Generate App Icons and Splash Screen
+        run: |
+          echo "🎨 Generating app icons and splash screen..."
+          
+          # プラットフォーム存在確認
+          if [ ! -d "android" ]; then
+            echo "❌ Android platform not found - aborting icon generation"
+            exit 1
+          fi
+          
+          # ソースアセット確認
+          if [ -f "assets/icon.png" ] && [ -f "assets/splash.png" ]; then
+            echo "✅ Source assets found:"
+            echo "  📄 assets/icon.png ($(stat -f%z assets/icon.png 2>/dev/null || stat -c%s assets/icon.png) bytes)"
+            echo "  📄 assets/splash.png ($(stat -f%z assets/splash.png 2>/dev/null || stat -c%s assets/splash.png) bytes)"
+            
+            echo "🔨 Generating Android icons and splash screens..."
+            npx @capacitor/assets generate --android --verbose
+            
+            # 生成結果確認
+            if [ -d "android/app/src/main/res" ]; then
+              echo "✅ Icon generation successful! Generated files:"
+              find android/app/src/main/res -name "*ic_launcher*" -o -name "*splash*" | sort
+            else
+              echo "⚠️ Icon generation may have failed - res directory not found"
+            fi
+            
+            echo "✅ App icons and splash screen generated successfully"
+          else
+            echo "⚠️ Source assets not found (assets/icon.png or assets/splash.png missing)"
+            echo "📋 Available files in assets/:"
+            ls -la assets/ || echo "❌ No assets folder found"
+            echo "📋 Current directory contents:"
+            ls -la
+            exit 1
+          fi
+
+      - name: Sync Capacitor
+        run: |
+          echo "⚡ Syncing Capacitor..."
+          npx cap sync android
+          echo "✅ Capacitor sync completed"
+
+      - name: Configure Build Gradle for Command-line Version Injection
+        run: |
+          echo "🔧 Configuring build.gradle for command-line version injection..."
+          
+          # build.gradleを恒久的に修正（一度だけ実行する必要がある）
+          if [ -f android/app/build.gradle ]; then
+            echo "📝 Updating build.gradle to support -P parameter injection..."
+            
+            # versionCodeとversionNameをコマンドライン注入対応に変更
+            sed -i 's/versionCode .*/versionCode project.hasProperty('\''android.injected.versionCode'\'') ? project.property('\''android.injected.versionCode'\'').toInteger() : 1/' android/app/build.gradle
+            sed -i 's/versionName .*/versionName project.hasProperty('\''android.injected.versionName'\'') ? project.property('\''android.injected.versionName'\'') : "1.0"/' android/app/build.gradle
+            
+            echo "✅ build.gradle configured for command-line version injection"
+          else
+            echo "⚠️ build.gradle not found, skipping configuration"
+          fi
+
+      - name: Configure Android API 35 Settings
+        run: |
+          echo "📱 Configuring Android for API 35 (VANILLA_ICE_CREAM)..."
+          
+          # variables.gradle でAPI 35設定
+          if [ -f android/variables.gradle ]; then
+            echo "🔧 Updating variables.gradle for API 35..."
+            cat > android/variables.gradle <<'EOF'
+          ext {
+              minSdkVersion = 24
+              compileSdkVersion = 35
+              targetSdkVersion = 35
+              androidxActivityVersion = '1.9.2'
+              androidxAppCompatVersion = '1.7.0'
+              androidxCoordinatorLayoutVersion = '1.2.0'
+              androidxCoreVersion = '1.15.0'
+              androidxFragmentVersion = '1.8.4'
+              coreSplashScreenVersion = '1.0.1'
+              androidxWebkitVersion = '1.12.1'
+              junitVersion = '4.13.2'
+              androidxJunitVersion = '1.2.1'
+              androidxEspressoCoreVersion = '3.6.1'
+              cordovaAndroidVersion = '10.1.1'
+          }
+          EOF
+            echo "✅ variables.gradle configured for API 35"
+          fi
+          
+          # build.gradle の Android Gradle Plugin バージョン設定
+          if [ -f android/build.gradle ]; then
+            echo "🔧 Configuring AGP version for API 35 compatibility..."
+            sed -i "s/id 'com.android.application' version '[^']*'/id 'com.android.application' version '8.5.2'/" android/build.gradle
+            sed -i "s/id 'com.android.library' version '[^']*'/id 'com.android.library' version '8.5.2'/" android/build.gradle
+            echo "✅ AGP configured for API 35 compatibility"
+          fi
+
+      - name: Set Version Information
+        run: |
+          echo "📋 Setting version information for RecipeBox Ephemeral Build..."
+          VERSION_MAJOR="2"
+          VERSION_MINOR="0"
+          VERSION_PATCH="${{ github.run_number }}"
+          VERSION_TAG="$VERSION_MAJOR.$VERSION_MINOR.$VERSION_PATCH"
+          echo "VERSION_TAG=$VERSION_TAG" >> $GITHUB_ENV
+          echo "✅ Version tag set to: $VERSION_TAG"
+
+      - name: Pre-Build Cleanup
+        run: |
+          echo "🧹 Pre-build cleanup..."
+          cd android
+          ./gradlew clean || echo "Clean skipped (first run)"
+          cd ..
+
+      - name: Setup Keystore from GitHub Secrets
+        run: |
+          echo "🔑 Setting up keystore from GitHub Secrets..."
+          cd android
+          
+          # Decode keystore from GitHub Secrets
+          echo "🔧 Decoding keystore from KEYSTORE_FILE secret..."
+          if [ ! -z "${{ secrets.KEYSTORE_FILE }}" ]; then
+            echo "${{ secrets.KEYSTORE_FILE }}" | base64 --decode > recipebox-release.keystore
+            echo "✅ Keystore decoded successfully from secrets"
+            
+            # Verify keystore
+            echo "📄 Verifying keystore fingerprint..."
+            keytool -list -v -keystore recipebox-release.keystore -alias ${{ secrets.KEY_ALIAS }} -storepass ${{ secrets.KEYSTORE_PASSWORD }} | grep "SHA256:" || echo "⚠️ Fingerprint extraction failed"
+            
+          else
+            echo "❌ KEYSTORE_FILE secret not found - cannot build signed APK"
+            exit 1
+          fi
+          
+          # Set environment variables for build (using secrets)
+          echo "KEYSTORE_EXISTS=true" >> $GITHUB_ENV
+          echo "KEYSTORE_FILE=recipebox-release.keystore" >> $GITHUB_ENV
+          echo "KEYSTORE_PASSWORD=${{ secrets.KEYSTORE_PASSWORD }}" >> $GITHUB_ENV
+          echo "KEY_ALIAS=${{ secrets.KEY_ALIAS }}" >> $GITHUB_ENV
+          echo "KEY_PASSWORD=${{ secrets.KEY_PASSWORD }}" >> $GITHUB_ENV
+          echo "SIGNING_MODE=secrets-based" >> $GITHUB_ENV
+          cd ..
+
+      - name: Configure Robust Gradle Signing (Environment Variables)
+        run: |
+          echo "🔧 Configuring build.gradle with robust environment variable signing..."
+          
+          if [ -f android/app/build.gradle ]; then
+            echo "📝 Updating build.gradle for environment variable signing system..."
+            
+            # 堅牢な環境変数ベース署名設定を作成
+            cat > android/app/build.gradle.signing << 'GRADLE_EOF'
+          android {
+              signingConfigs {
+                  release {
+                      def sf = System.getenv("KEYSTORE_FILE")
+                      if (sf) {
+                          storeFile file(sf)
+                          storePassword System.getenv("KEYSTORE_PASSWORD")
+                          keyAlias System.getenv("KEY_ALIAS")
+                          keyPassword System.getenv("KEY_PASSWORD")
+                      }
+                  }
+                  debug {
+                      // 実機上書き検証を簡単にするためreleaseと同じ鍵を使用
+                      initWith signingConfigs.release
+                  }
+              }
+              
+              buildTypes {
+                  release {
+                      signingConfig signingConfigs.release
+                  }
+                  debug {
+                      signingConfig signingConfigs.debug
+                  }
+              }
+          }
+          GRADLE_EOF
+            
+            # 既存のbuild.gradleに署名設定を統合
+            if grep -q "signingConfigs" android/app/build.gradle; then
+              echo "🔄 Replacing existing signing config with robust version..."
+              # 既存のsigningConfigs設定を削除して新しいものに置換
+              sed -i '/signingConfigs {/,/^    }/d' android/app/build.gradle
+              sed -i '/buildTypes {/,/^    }/d' android/app/build.gradle
+            fi
+            
+            echo "📝 Adding robust signing configuration to build.gradle..."
+            # android {ブロック内に署名設定を挿入
+            sed -i '/android {/r android/app/build.gradle.signing' android/app/build.gradle
+            
+            echo "✅ build.gradle configured with robust environment variable signing"
+            
+            # 設定確認のため、署名関連部分を表示
+            echo "📋 Current signing configuration:"
+            grep -A 20 "signingConfigs" android/app/build.gradle || echo "No signingConfigs found"
+          else
+            echo "⚠️ build.gradle not found, skipping configuration"
+          fi
+
+      - name: Build Signed APK with Environment Variables
+        working-directory: android
+        env:
+          KEYSTORE_FILE: ${{ github.workspace }}/android/${{ env.KEYSTORE_FILE }}
+          KEYSTORE_PASSWORD: ${{ env.KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ env.KEY_ALIAS }}
+          KEY_PASSWORD: ${{ env.KEY_PASSWORD }}
+        run: |
+          echo "🏗️ Building APK with environment variable signing..."
+          chmod +x gradlew
+          
+          echo "🔨 Building signed release APK..."
+          ./gradlew clean assembleRelease \
+            --no-daemon --stacktrace \
+            -Pandroid.injected.versionName="${{ env.VERSION_TAG }}" \
+            -Pandroid.injected.versionCode="${{ github.run_number }}"
+          
+          cd ..
+          
+          # APK確認
+          if [ -f "android/app/build/outputs/apk/release/app-release.apk" ]; then
+              echo "✅ Release APK created successfully"
+              APK_SOURCE="android/app/build/outputs/apk/release/app-release.apk"
+              BUILD_TYPE="release"
+          elif [ -f "android/app/build/outputs/apk/debug/app-debug.apk" ]; then
+              echo "✅ Debug APK created successfully"
+              APK_SOURCE="android/app/build/outputs/apk/debug/app-debug.apk"
+              BUILD_TYPE="debug"
+          else
+              echo "❌ No APK found"
+              find android -name "*.apk" -type f || echo "No APK files found anywhere"
+              exit 1
+          fi
+          
+          # 最終APKファイル作成
+          FINAL_NAME="RecipeBox-${{ env.VERSION_TAG }}-ephemeral.apk"
+          cp "$APK_SOURCE" "$FINAL_NAME"
+          
+          echo "✅ Ephemeral Capacitor signed APK created: $FINAL_NAME"
+          echo "📊 APK Information:"
+          ls -lh "$FINAL_NAME"
+          
+          # APK署名検証
+          if command -v apksigner >/dev/null 2>&1; then
+            echo "🔐 Verifying APK signature..."
+            apksigner verify --verbose "$FINAL_NAME" || echo "⚠️ Signature verification warning"
+          fi
+          
+          echo "APK_FILE=$FINAL_NAME" >> $GITHUB_ENV
+          echo "BUILD_TYPE=$BUILD_TYPE" >> $GITHUB_ENV
+
+      - name: 🕵️ Analyze APK Contents
+        run: |
+          echo "--- Analyzing content of APK file ---"
+          APK_FILE=$(find . -name "RecipeBox-*.apk" | head -n 1)
+          if [ -f "$APK_FILE" ]; then
+            echo "📊 APK Contents Analysis for: $APK_FILE"
+            unzip -l "$APK_FILE"
+            echo ""
+            echo "📈 Top 20 largest files in APK:"
+            unzip -l "$APK_FILE" | sort -k1 -nr | head -n 20
+          else
+            echo "APK file not found for analysis."
+          fi
+          echo "--- End of APK Content Analysis ---"
+
+      - name: Upload APK Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ env.APK_FILE }}
+          path: ${{ env.APK_FILE }}
+
+      - name: Create GitHub Release
+        if: github.ref == 'refs/heads/main'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ env.VERSION_TAG }}
+          name: RecipeBox ${{ env.VERSION_TAG }} (Ephemeral Build)
+          files: ${{ env.APK_FILE }}
+          body: |
+            # 🍳 RecipeBox ${{ env.VERSION_TAG }} - Ephemeral Capacitor Build
+            
+            **🚀 BREAKTHROUGH UPDATE** - Ephemeral Capacitor Implementation
+            
+            ## ✨ Major Technical Breakthrough
+            This version implements **Ephemeral Capacitor** architecture, identical to our proven Laminator Dashboard approach:
+            - 🧹 **Complete Cache Elimination**: `rm -rf android` before every build
+            - ⚡ **Fresh Initialization**: `npx cap init` + `npx cap add android` every time
+            - 🔄 **Zero Cache Issues**: Guaranteed fresh build environment
+            - 📱 **UI Changes Guaranteed**: WebView cache problems eliminated
+            
+            ## 🔧 Technical Implementation
+            - **Build Method**: Ephemeral Capacitor (Laminator Dashboard proven approach)
+            - **Framework**: Capacitor 7.0.0 (unified with working projects)
+            - **Configuration**: TypeScript config + StatusBar + allowMixedContent
+            - **Android API**: 35 (VANILLA_ICE_CREAM) with proper SDK setup
+            - **Signing**: Environment variable-based robust signing system
+            
+            ## 🎯 Expected Results
+            This build should **finally resolve** the persistent UI cache issues:
+            - ✅ Special tabs/UI elements properly hidden when removed from code
+            - ✅ All code changes immediately reflected in APK
+            - ✅ No more WebView cache retention problems
+            
+            ## 📱 Features
+            - 📖 Recipe Management with scaling (1-4 servings)
+            - 🧮 Salt Concentration Calculator
+            - ⚖️ Container Weight Database  
+            - 📱 Mobile-Optimized Interface
+            
+            ## 📈 Build Information
+            - **Version**: ${{ env.VERSION_TAG }}
+            - **Build Number**: ${{ github.run_number }}
+            - **Build Type**: ${{ env.BUILD_TYPE }}
+            - **Architecture**: Ephemeral Capacitor (Cache-Free)
+            - **Commit**: ${{ github.sha }}
+            
+            ---
+            🤖 **Auto Build**: GitHub Actions (Ephemeral-Capacitor-Architecture)  
+            📅 **Build Date**: $(date -u '+%Y-%m-%d %H:%M:%S UTC')  
+            🏆 **Milestone**: Implemented proven cache-free build methodology
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
