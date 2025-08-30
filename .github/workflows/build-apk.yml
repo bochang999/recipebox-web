@@ -16,6 +16,7 @@ jobs:
     runs-on: ubuntu-latest
     
     steps:
+    # ========== 1. 環境セットアップフェーズ ==========
     - name: Checkout Repository
       uses: actions/checkout@v4
       with:
@@ -43,11 +44,15 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-gradle-
 
+    # ========== 2. 依存関係インストールフェーズ ==========
     - name: Install Dependencies
       run: |
+        echo "📦 依存関係インストール開始"
         npm ci
         npm install -g @capacitor/cli
+        echo "✅ 依存関係インストール完了"
 
+    # ========== 3. ウェブアセット構築フェーズ ==========
     - name: Validate PWA Assets
       run: |
         echo "🔍 PWA設定ファイル確認"
@@ -74,6 +79,7 @@ jobs:
 
     - name: Update App Version
       run: |
+        echo "📝 アプリバージョン更新開始"
         # package.jsonのバージョン更新
         jq --arg version "${{ env.VERSION_TAG }}" '.version = $version' package.json > package.json.tmp
         mv package.json.tmp package.json
@@ -82,19 +88,7 @@ jobs:
         jq --arg version "${{ env.VERSION_TAG }}" '.version = $version' manifest.json > manifest.json.tmp
         mv manifest.json.tmp manifest.json
         
-        echo "📝 バージョン ${{ env.VERSION_TAG }} に更新完了"
-
-    - name: Initialize Capacitor Project
-      run: |
-        echo "🔧 Capacitor初期化開始"
-        
-        # プロジェクト初期化（既存設定を使用）
-        npx cap init --web-dir ./ || echo "既に初期化済み"
-        
-        # Androidプラットフォーム追加
-        npx cap add android || echo "Android既に追加済み"
-        
-        echo "✅ Capacitor初期化完了"
+        echo "✅ バージョン ${{ env.VERSION_TAG }} に更新完了"
 
     - name: Setup Keystore from GitHub Secrets
       run: |
@@ -126,17 +120,35 @@ jobs:
         
         echo "🔐 キーストア設定完了"
 
-    - name: Initialize Capacitor and Sync
+    # ========== 4. Capacitor初期化フェーズ ==========
+    - name: Initialize Capacitor Project
       run: |
-        echo "🤖 Capacitor Androidプラットフォーム初期化"
+        echo "🔧 Capacitor初期化開始"
+        
+        # 既存Androidディレクトリがある場合は削除（クリーンスタート）
+        if [ -d "android" ]; then
+          echo "🗑️ 既存Androidディレクトリを削除"
+          rm -rf android
+        fi
+        
+        # プロジェクト初期化（既存設定を使用）
+        npx cap init --web-dir ./
+        
+        # Androidプラットフォーム追加
         npx cap add android
+        
+        echo "✅ Capacitor初期化完了"
+
+    - name: Sync Capacitor Project
+      run: |
         echo "🔄 Capacitor同期開始"
         npx cap sync android
         echo "✅ Capacitor同期完了"
 
+    # ========== 5. Android APKビルドフェーズ ==========
     - name: Build Android APK
       run: |
-        echo "🏗️ Android APK ビルド開始"
+        echo "🏧️ Android APK ビルド開始"
         cd android
         
         # Gradleラッパーに実行権限付与
@@ -165,15 +177,15 @@ jobs:
         # zipalign実行
         $ANDROID_HOME/build-tools/$(ls $ANDROID_HOME/build-tools | tail -1)/zipalign -v 4 \
           app-release-signed.apk \
-          pwatemplate_${{ env.VERSION_TAG }}.apk
+          recipebox_${{ env.VERSION_TAG }}.apk
         
-        echo "🎯 署名完了: pwatemplate_${{ env.VERSION_TAG }}.apk"
+        echo "🎯 署名完了: recipebox_${{ env.VERSION_TAG }}.apk"
 
     - name: Verify APK
       run: |
         echo "🔍 APK検証開始"
         
-        APK_PATH="android/app/build/outputs/apk/release/pwatemplate_${{ env.VERSION_TAG }}.apk"
+        APK_PATH="android/app/build/outputs/apk/release/recipebox_${{ env.VERSION_TAG }}.apk"
         
         if [ -f "$APK_PATH" ]; then
           APK_SIZE=$(du -h "$APK_PATH" | cut -f1)
@@ -189,8 +201,8 @@ jobs:
     - name: Upload APK Artifact
       uses: actions/upload-artifact@v4
       with:
-        name: PWA-Template-APK-${{ env.VERSION_TAG }}
-        path: android/app/build/outputs/apk/release/pwatemplate_${{ env.VERSION_TAG }}.apk
+        name: RecipeBox-APK-${{ env.VERSION_TAG }}
+        path: android/app/build/outputs/apk/release/recipebox_${{ env.VERSION_TAG }}.apk
         retention-days: 30
 
     - name: Create Release (on main branch)
@@ -200,36 +212,35 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         tag_name: v${{ env.VERSION_TAG }}
-        release_name: PWA Template v${{ env.VERSION_TAG }}
+        release_name: RecipeBox v${{ env.VERSION_TAG }}
         body: |
-          ## 📱 PWA Template APK v${{ env.VERSION_TAG }}
+          ## 📱 RecipeBox APK v${{ env.VERSION_TAG }}
           
-          ### ✨ テンプレート機能
-          - 📱 PWA→APK変換テンプレート
-          - 🎨 レスポンシブUI設計
+          ### ✨ アプリ機能
+          - 📝 レシピ管理システム
+          - 🔢 分量調整機能
+          - 🧂 塩分濃度計算
           - 💾 LocalStorage自動保存
-          - ⚙️ 設定システム完備
-          - 🔄 Service Worker対応
+          - 🔄 PWA対応
           
           ### 🛠️ 開発環境
           - Node.js ${{ env.NODE_VERSION }}
           - Java JDK ${{ env.JAVA_VERSION }}
-          - Capacitor 5.x
+          - Capacitor 7.x
           - GitHub Actions自動ビルド
           
           ### 📋 使用方法
-          1. このテンプレートをフォーク/クローン
-          2. `npm install` で依存関係インストール
-          3. `npm run dev` で開発開始
-          4. GitHubにプッシュで自動APK生成
+          1. APKをダウンロード
+          2. Android端末にインストール
+          3. レシピを登録・管理
           
-          **APKファイル**: PWA-Template-APK-${{ env.VERSION_TAG }}
+          **APKファイル**: RecipeBox-APK-${{ env.VERSION_TAG }}
         draft: false
         prerelease: false
 
     - name: Build Summary
       run: |
-        echo "## 🎯 PWA Template APK Build Summary" >> $GITHUB_STEP_SUMMARY
+        echo "## 🎯 RecipeBox APK Build Summary" >> $GITHUB_STEP_SUMMARY
         echo "" >> $GITHUB_STEP_SUMMARY
         echo "| 項目 | 値 |" >> $GITHUB_STEP_SUMMARY
         echo "|------|-----|" >> $GITHUB_STEP_SUMMARY
@@ -240,7 +251,7 @@ jobs:
         echo "| コミット | ${{ github.sha }} |" >> $GITHUB_STEP_SUMMARY
         echo "" >> $GITHUB_STEP_SUMMARY
         echo "### 📦 成果物" >> $GITHUB_STEP_SUMMARY
-        echo "- APKファイル: \`pwatemplate_${{ env.VERSION_TAG }}.apk\`" >> $GITHUB_STEP_SUMMARY
-        echo "- アーティファクト: PWA-Template-APK-${{ env.VERSION_TAG }}" >> $GITHUB_STEP_SUMMARY
+        echo "- APKファイル: \`recipebox_${{ env.VERSION_TAG }}.apk\`" >> $GITHUB_STEP_SUMMARY
+        echo "- アーティファクト: RecipeBox-APK-${{ env.VERSION_TAG }}" >> $GITHUB_STEP_SUMMARY
         echo "" >> $GITHUB_STEP_SUMMARY
-        echo "🚀 **APKビルドが正常に完了しました！**" >> $GITHUB_STEP_SUMMARY
+        echo "🚀 **RecipeBox APKビルドが正常に完了しました！**" >> $GITHUB_STEP_SUMMARY
