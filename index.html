@@ -2,17 +2,35 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>RecipeBox - 料理レシピ管理アプリ</title>
     <link rel="stylesheet" href="style.css">
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#2196F3">
     <meta name="description" content="分量調整と塩分濃度計算ができるシンプルな料理レシピ管理アプリ">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
     
     <!-- PWA用アイコン -->
+    <link rel="apple-touch-icon" sizes="180x180" href="icons/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="icons/favicon-16x16.png">
     <link rel="apple-touch-icon" href="icons/icon-192x192.png">
     <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192x192.png">
     <link rel="icon" type="image/png" sizes="any" href="icons/icon-512x512.png">
+    
+    <!-- Capacitor プラグイン読み込み (APK環境での動作確保) -->
+    <script>
+        // APK環境でのCapacitor検出
+        if (typeof window.Capacitor !== 'undefined') {
+            // ネイティブ環境では自動的に利用可能
+            console.log('✅ ネイティブCapacitor環境検出');
+        } else {
+            // Web環境でのみCDN読み込み
+            console.log('🌐 Web環境でCapacitor CDN読み込み');
+            document.write('<script src="https://unpkg.com/@capacitor/core@7/dist/capacitor.js"><\/script>');
+        }
+    </script>
 </head>
 <body>
     <div id="app">
@@ -349,7 +367,49 @@
         </div>
     </div>
 
-    <script src="config.js"></script>
     <script src="script.js"></script>
+    
+    <!-- APK Status Bar初期化 -->
+    <script>
+        // APK環境でのStatus Bar設定
+        document.addEventListener('DOMContentLoaded', async function() {
+            if (window.Capacitor && window.Capacitor.isNativePlatform()) {
+                try {
+                    console.log('🔧 APK Status Bar初期化開始');
+                    
+                    // Status Barプラグインが利用可能な場合のみ実行
+                    if (window.Capacitor.Plugins.StatusBar) {
+                        await window.Capacitor.Plugins.StatusBar.setStyle({
+                            style: 'DARK'
+                        });
+                        await window.Capacitor.Plugins.StatusBar.setBackgroundColor({
+                            color: '#2196F3'
+                        });
+                        await window.Capacitor.Plugins.StatusBar.setOverlaysWebView({
+                            overlay: false
+                        });
+                        console.log('✅ APK Status Bar設定完了');
+                    }
+                } catch (error) {
+                    console.log('⚠️ Status Bar設定失敗:', error);
+                }
+            }
+        });
+    </script>
+    
+    <!-- Service Worker登録 (PWA対応) -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', function() {
+                navigator.serviceWorker.register('./sw.js')
+                    .then(function(registration) {
+                        console.log('✅ Service Worker登録成功:', registration.scope);
+                    })
+                    .catch(function(error) {
+                        console.log('❌ Service Worker登録失敗:', error);
+                    });
+            });
+        }
+    </script>
 </body>
 </html>
