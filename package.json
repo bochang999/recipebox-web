@@ -46,14 +46,15 @@
   "homepage": "https://github.com/YOUR_USERNAME/pwa-to-apk-template#readme",
   "dependencies": {
     "@capacitor/core": "^7.0.0",
-    "@capacitor/preferences": "^7.0.0",
-    "@capacitor/filesystem": "^7.0.0"
+    "@capacitor/filesystem": "^7.0.0",
+    "@capacitor/preferences": "^7.0.0"
   },
   "devDependencies": {
+    "@capacitor/android": "^7.0.0",
     "@capacitor/cli": "^7.0.0",
-    "@capacitor/android": "^7.0.0", 
     "@capacitor/status-bar": "^7.0.0",
-    "http-server": "^14.0.0"
+    "http-server": "^14.0.0",
+    "typescript": "^5.9.2"
   },
   "engines": {
     "node": ">=16.0.0",
