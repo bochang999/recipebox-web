@@ -14,7 +14,7 @@ const config: CapacitorConfig = {
     webContentsDebuggingEnabled: true,
     loggingBehavior: 'debug',
     useLegacyBridge: false,
-    appendUserAgent: 'PWATemplate/1.0',
+    appendUserAgent: 'RecipeBox/2.16.0',
     overrideUserAgent: null,
     backgroundColor: '#FFFFFF',
     toolbarColor: '#2196F3',
@@ -60,11 +60,19 @@ const config: CapacitorConfig = {
       statusBarStyle: 'dark'
     },
     Device: {},
-    Preferences: {},
+    Storage: {},
     Filesystem: {},
     Network: {},
     Toast: {},
-    Haptics: {}
+    Haptics: {},
+    LocalNotifications: {
+      smallIcon: 'ic_stat_notification',
+      iconColor: '#2196F3',
+      sound: null
+    },
+    PushNotifications: {
+      presentationOptions: ['badge', 'sound', 'alert']
+    }
   },
   cordova: {},
   includePlugins: [
@@ -73,11 +81,13 @@ const config: CapacitorConfig = {
     '@capacitor/keyboard',
     '@capacitor/status-bar',
     '@capacitor/splash-screen',
-    '@capacitor/preferences',
+    '@capacitor/storage',
     '@capacitor/filesystem',
     '@capacitor/device',
     '@capacitor/network',
-    '@capacitor/toast'
+    '@capacitor/toast',
+    '@capacitor/local-notifications',
+    '@capacitor/push-notifications'
   ]
 };
 
