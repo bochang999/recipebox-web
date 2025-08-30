@@ -129,12 +129,6 @@ jobs:
         mkdir -p dist
         cp index.html style.css script.js manifest.json sw.js config.js dist/
         
-        # 既存Androidディレクトリ削除（クリーンスタート）
-        if [ -d "android" ]; then
-          echo "🗑️ 既存Androidディレクトリを削除"
-          rm -rf android
-        fi
-        
         echo "✅ ウェブアセット準備完了"
 
     - name: Initialize and Sync Capacitor Project
