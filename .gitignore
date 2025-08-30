@@ -167,7 +167,7 @@ logs
 *.log
 
 # Lock files (プロジェクト次第で管理)
-# package-lock.json
+# package-lock.json  # CIで必要なのでトラッキング
 # yarn.lock
 
 # === PWA関連 ===
