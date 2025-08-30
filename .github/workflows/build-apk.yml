@@ -126,8 +126,10 @@ jobs:
         
         echo "🔐 キーストア設定完了"
 
-    - name: Sync Capacitor
+    - name: Initialize Capacitor and Sync
       run: |
+        echo "🤖 Capacitor Androidプラットフォーム初期化"
+        npx cap add android
         echo "🔄 Capacitor同期開始"
         npx cap sync android
         echo "✅ Capacitor同期完了"
