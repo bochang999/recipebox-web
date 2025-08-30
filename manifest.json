@@ -1,17 +1,17 @@
 {
-    "name": "PWA Template",
-    "short_name": "PWATemplate",
-    "description": "PWA→APK変換開発テンプレート",
-    "version": "1.0.0",
+    "name": "RecipeBox",
+    "short_name": "RecipeBox",
+    "description": "分量調整と塩分濃度計算ができるシンプルな料理レシピ管理アプリ",
+    "version": "2.16.0",
     "start_url": "./",
     "scope": "./",
     "display": "standalone",
     "orientation": "portrait-primary",
-    "theme_color": "#2C3E50",
+    "theme_color": "#2196F3",
     "background_color": "#FFFFFF",
     "lang": "ja",
     "dir": "ltr",
-    "categories": ["productivity", "utilities", "developer"],
+    "categories": ["food", "lifestyle", "productivity"],
     "prefer_related_applications": false,
     "icons": [
         {
@@ -99,10 +99,10 @@
     ],
     "shortcuts": [
         {
-            "name": "カウンター",
-            "short_name": "Counter",
-            "description": "カウンター機能を直接開く",
-            "url": "./?shortcut=counter",
+            "name": "料理レシピ",
+            "short_name": "Recipes",
+            "description": "料理レシピ一覧を直接開く",
+            "url": "./?shortcut=recipes",
             "icons": [
                 {
                     "src": "icons/icon-192x192.png",
@@ -112,10 +112,10 @@
             ]
         },
         {
-            "name": "設定",
-            "short_name": "Settings",
-            "description": "設定画面を直接開く",
-            "url": "./?shortcut=settings",
+            "name": "塩分濃度計算機",
+            "short_name": "SaltCalc",
+            "description": "塩分濃度計算機を直接開く",
+            "url": "./?shortcut=salt-calc",
             "icons": [
                 {
                     "src": "icons/icon-192x192.png",
