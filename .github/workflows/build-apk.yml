@@ -101,7 +101,7 @@ jobs:
       run: |
         echo "🔑 キーストア設定開始"
         
-        if [ -z "${{ secrets.KEYSTORE_B64 }}" ]; then
+        if [ -z "${{ secrets.KEYSTORE_FILE }}" ]; then
           echo "⚠️ GitHub Secrets未設定 - RecipeBox固定キーストア生成"
           keytool -genkeypair -v \
             -keystore template-release.keystore \
@@ -118,7 +118,7 @@ jobs:
           echo "KEY_PASSWORD=recipebox2024" >> $GITHUB_ENV
         else
           echo "✅ GitHub Secrets設定済み - 本番キーストア使用"
-          echo "${{ secrets.KEYSTORE_B64 }}" | base64 --decode > template-release.keystore
+          echo "${{ secrets.KEYSTORE_FILE }}" | base64 --decode > template-release.keystore
           
           echo "KEYSTORE_PASSWORD=${{ secrets.KEYSTORE_PASSWORD }}" >> $GITHUB_ENV
           echo "KEY_ALIAS=${{ secrets.KEY_ALIAS }}" >> $GITHUB_ENV
