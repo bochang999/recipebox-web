@@ -164,7 +164,7 @@ jobs:
         
         # APK署名
         jarsigner -verbose \
-          -keystore ../../../../../template-release.keystore \
+          -keystore ../../../../../../template-release.keystore \
           -storepass ${{ env.KEYSTORE_PASSWORD }} \
           -keypass ${{ env.KEY_PASSWORD }} \
           -signedjar app-release-signed.apk \
