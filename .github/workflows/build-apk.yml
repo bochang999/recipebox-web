@@ -158,27 +158,30 @@ jobs:
         
         echo "✅ APK ビルド完了"
 
-    - name: Sign APK
+    - name: Sign APK with apksigner
+      id: sign_apk
       run: |
-        echo "✍️ APK署名開始"
+        echo "✍️ APK署名開始 (Modern apksigner)"
         
         cd android/app/build/outputs/apk/release
         
-        # APK署名
-        jarsigner -verbose \
-          -keystore ../../../../../../template-release.keystore \
-          -storepass ${{ env.KEYSTORE_PASSWORD }} \
-          -keypass ${{ env.KEY_PASSWORD }} \
-          -signedjar app-release-signed.apk \
-          app-release-unsigned.apk \
-          ${{ env.KEY_ALIAS }}
+        # 最新のAndroid build-toolsのパスを取得
+        BUILD_TOOLS_PATH=$(ls -d $ANDROID_HOME/build-tools/* | sort -r | head -n 1)
+        echo "🔧 使用build-tools: $BUILD_TOOLS_PATH"
         
-        # zipalign実行
-        $ANDROID_HOME/build-tools/$(ls $ANDROID_HOME/build-tools | tail -1)/zipalign -v 4 \
-          app-release-signed.apk \
-          recipebox_${{ env.VERSION_TAG }}.apk
+        # APK署名 (signature scheme v2対応)
+        $BUILD_TOOLS_PATH/apksigner sign \
+          --ks ../../../../../../template-release.keystore \
+          --ks-key-alias ${{ env.KEY_ALIAS }} \
+          --ks-pass env:KEYSTORE_PASSWORD \
+          --key-pass env:KEY_PASSWORD \
+          --out recipebox_${{ env.VERSION_TAG }}.apk \
+          app-release-unsigned.apk
         
-        echo "🎯 署名完了: recipebox_${{ env.VERSION_TAG }}.apk"
+        # 署名検証
+        $BUILD_TOOLS_PATH/apksigner verify recipebox_${{ env.VERSION_TAG }}.apk
+        
+        echo "🎯 署名完了 (v2対応): recipebox_${{ env.VERSION_TAG }}.apk"
 
     - name: Verify APK
       run: |
