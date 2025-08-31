@@ -138,52 +138,30 @@ jobs:
         
         echo "✅ ウェブアセット準備完了"
 
-    - name: Initialize Capacitor and Generate Icons
+    - name: Initialize and Sync Capacitor Project
       run: |
         echo "🔄 Capacitor同期開始"
         npx cap sync android
         echo "✅ Capacitor同期完了"
+
+    - name: Generate App Icons and Splash Screens (Capacitor Assets)
+      run: |
+        echo "🎨 Androidアダプティブアイコン生成開始 (Capacitor公式ツール)"
         
-        echo "📦 ImageMagickインストール開始"
-        sudo apt-get update && sudo apt-get install -y imagemagick
-        echo "✅ ImageMagickインストール完了"
-        
-        echo "🎨 Androidアプリアイコン生成開始 (cap sync直後実行)"
-        
-        # アイコンサイズとディレクトリの定義
-        declare -A sizes=(
-          ["mipmap-mdpi"]=48
-          ["mipmap-hdpi"]=72
-          ["mipmap-xhdpi"]=96
-          ["mipmap-xxhdpi"]=144
-          ["mipmap-xxxhdpi"]=192
-        )
-        
-        # ソースアイコンの確認
-        SOURCE_ICON="icons/icon-512x512.png"
-        if [ ! -f "$SOURCE_ICON" ]; then
-          echo "❌ ソースアイコンが見つかりません: $SOURCE_ICON"
-          exit 1
-        fi
-        
-        # 各解像度でアイコンを生成（cap sync直後なので上書きされない）
-        for dir in "${!sizes[@]}"; do
-          size=${sizes[$dir]}
-          target_dir="android/app/src/main/res/$dir"
-          
-          # ディレクトリ作成
-          mkdir -p "$target_dir"
-          
-          # アイコン生成
-          convert "$SOURCE_ICON" -resize ${size}x${size} "$target_dir/ic_launcher.png"
-          convert "$SOURCE_ICON" -resize ${size}x${size} "$target_dir/ic_launcher_round.png"
-          
-          echo "✅ Generated ${size}x${size} icons in $dir"
-        done
+        # Capacitor公式アセットツールでアダプティブアイコン生成
+        npx @capacitor/assets generate --android
         
         # 生成結果確認
-        echo "✅ アイコン生成完了! 生成ファイル:"
-        find android/app/src/main/res -name "*ic_launcher*" | sort
+        echo "✅ アダプティブアイコン生成完了! 生成ファイル:"
+        find android/app/src/main/res -name "*ic_launcher*" -o -name "*adaptive*" | sort
+        
+        # アダプティブアイコン仕様確認
+        if [ -d "android/app/src/main/res/mipmap-anydpi-v26" ]; then
+          echo "✅ Android 8.0+ アダプティブアイコン対応完了"
+          ls -la android/app/src/main/res/mipmap-anydpi-v26/
+        else
+          echo "⚠️ アダプティブアイコンディレクトリが生成されていません"
+        fi
 
     # ========== 5. Android APKビルドフェーズ ==========
     - name: Build Android APK
