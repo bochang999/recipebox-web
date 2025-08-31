@@ -50,6 +50,8 @@ jobs:
         echo "📦 依存関係インストール開始"
         npm ci
         npm install -g @capacitor/cli
+        # CI環境でのみ@capacitor/assetsをインストール (Sharp依存関係がCI環境で利用可能)
+        npm install @capacitor/assets@^3.0.5
         echo "✅ 依存関係インストール完了"
 
     - name: Run Lint and Format Check
