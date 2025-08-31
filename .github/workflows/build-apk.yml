@@ -138,6 +138,9 @@ jobs:
         
         echo "✅ ウェブアセット準備完了"
 
+    - name: Install ImageMagick
+      run: sudo apt-get update && sudo apt-get install -y imagemagick
+
     - name: Generate Android App Icons
       run: |
         echo "🎨 Androidアプリアイコン生成開始"
