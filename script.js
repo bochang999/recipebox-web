@@ -149,12 +149,29 @@ class RecipeBoxApp {
 
     // レシピ関連
     loadRecipes() {
-        // BOC-32: バージョン付きキーでキャッシュ無効化
-        const stored = localStorage.getItem('recipebox-recipes-v2.0');
+        // BOC-41: 重複データ問題解決のためバージョンアップ
+        const stored = localStorage.getItem('recipebox-recipes-v2.1');
         if (stored) {
-            return JSON.parse(stored);
+            const recipes = JSON.parse(stored);
+            // 重複チェック：IDで重複を除去
+            return this.removeDuplicateRecipes(recipes);
         }
         return this.getInitialRecipes();
+    }
+    
+    removeDuplicateRecipes(recipes) {
+        const seen = new Set();
+        const uniqueRecipes = [];
+        
+        for (const recipe of recipes) {
+            if (!seen.has(recipe.id)) {
+                seen.add(recipe.id);
+                uniqueRecipes.push(recipe);
+            }
+        }
+        
+        console.log(`重複チェック: ${recipes.length} → ${uniqueRecipes.length} (${recipes.length - uniqueRecipes.length}件削除)`);
+        return uniqueRecipes;
     }
 
     getInitialRecipes() {
@@ -1438,8 +1455,9 @@ class RecipeBoxApp {
     }
 
     saveRecipes() {
-        // BOC-32: バージョン付きキーでキャッシュ無効化
-        localStorage.setItem('recipebox-recipes-v2.0', JSON.stringify(this.recipes));
+        // BOC-41: 重複データ問題解決のためバージョンアップ
+        const uniqueRecipes = this.removeDuplicateRecipes(this.recipes);
+        localStorage.setItem('recipebox-recipes-v2.1', JSON.stringify(uniqueRecipes));
     }
 
     renderRecipes() {

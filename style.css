@@ -13,6 +13,20 @@ body {
     /* ステータスバーとの重なりを防ぐためのsafe-area対応 */
     padding-top: max(env(safe-area-inset-top), 24px);
     padding-bottom: env(safe-area-inset-bottom);
+    position: relative;
+}
+
+/* ステータスバー緩衝材 - アプリテーマカラーで背景設定 */
+body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: max(env(safe-area-inset-top), 24px);
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    z-index: 1000;
+    pointer-events: none;
 }
 
 /* アプリ全体のコンテナ */

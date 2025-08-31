@@ -138,18 +138,17 @@ jobs:
         
         echo "✅ ウェブアセット準備完了"
 
-    - name: Initialize and Sync Capacitor Project
+    - name: Initialize Capacitor and Generate Icons
       run: |
         echo "🔄 Capacitor同期開始"
         npx cap sync android
         echo "✅ Capacitor同期完了"
-
-    - name: Install ImageMagick
-      run: sudo apt-get update && sudo apt-get install -y imagemagick
-    
-    - name: Generate App Icons (ImageMagick Method)
-      run: |
-        echo "🎨 Androidアプリアイコン生成開始 (ImageMagick方式)"
+        
+        echo "📦 ImageMagickインストール開始"
+        sudo apt-get update && sudo apt-get install -y imagemagick
+        echo "✅ ImageMagickインストール完了"
+        
+        echo "🎨 Androidアプリアイコン生成開始 (cap sync直後実行)"
         
         # アイコンサイズとディレクトリの定義
         declare -A sizes=(
@@ -167,7 +166,7 @@ jobs:
           exit 1
         fi
         
-        # 各解像度でアイコンを生成
+        # 各解像度でアイコンを生成（cap sync直後なので上書きされない）
         for dir in "${!sizes[@]}"; do
           size=${sizes[$dir]}
           target_dir="android/app/src/main/res/$dir"
