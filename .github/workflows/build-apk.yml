@@ -138,37 +138,33 @@ jobs:
         
         echo "✅ ウェブアセット準備完了"
 
-    - name: Install ImageMagick
-      run: sudo apt-get update && sudo apt-get install -y imagemagick
-
-    - name: Generate Android App Icons
-      run: |
-        echo "🎨 Androidアプリアイコン生成開始"
-        
-        # Android mipmap directories作成
-        mkdir -p android/app/src/main/res/mipmap-{mdpi,hdpi,xhdpi,xxhdpi,xxxhdpi}
-        
-        # 提供されたアイコンから適切なサイズに変換
-        convert icons/icon-96x96.png -resize 48x48 android/app/src/main/res/mipmap-mdpi/ic_launcher.png
-        cp icons/icon-72x72.png android/app/src/main/res/mipmap-hdpi/ic_launcher.png
-        cp icons/icon-96x96.png android/app/src/main/res/mipmap-xhdpi/ic_launcher.png
-        cp icons/icon-144x144.png android/app/src/main/res/mipmap-xxhdpi/ic_launcher.png
-        cp icons/icon-192x192.png android/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png
-        
-        # Round icon variants (同じアイコンをコピー)
-        cp android/app/src/main/res/mipmap-mdpi/ic_launcher.png android/app/src/main/res/mipmap-mdpi/ic_launcher_round.png
-        cp android/app/src/main/res/mipmap-hdpi/ic_launcher.png android/app/src/main/res/mipmap-hdpi/ic_launcher_round.png
-        cp android/app/src/main/res/mipmap-xhdpi/ic_launcher.png android/app/src/main/res/mipmap-xhdpi/ic_launcher_round.png
-        cp android/app/src/main/res/mipmap-xxhdpi/ic_launcher.png android/app/src/main/res/mipmap-xxhdpi/ic_launcher_round.png
-        cp android/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png android/app/src/main/res/mipmap-xxxhdpi/ic_launcher_round.png
-        
-        echo "✅ アプリアイコン生成完了"
-
     - name: Initialize and Sync Capacitor Project
       run: |
         echo "🔄 Capacitor同期開始"
         npx cap sync android
         echo "✅ Capacitor同期完了"
+
+    - name: Generate App Icons (Capacitor Assets Method)
+      run: |
+        echo "🎨 Androidアプリアイコン生成開始 (ラミオペ方式)"
+        
+        # assets/ディレクトリにマスターアイコンを準備 (512x512を使用)
+        mkdir -p assets
+        cp icons/icon-512x512.png assets/icon.png
+        echo "✅ マスターアイコン assets/icon.png 準備完了"
+        
+        # Capacitor公式アセット生成ツールを使用
+        npx @capacitor/assets generate --android --verbose
+        
+        # 生成結果確認
+        if [ -d "android/app/src/main/res" ]; then
+          echo "✅ アイコン生成成功! 生成ファイル:"
+          find android/app/src/main/res -name "*ic_launcher*" | sort
+        else
+          echo "⚠️ アイコン生成失敗 - resディレクトリが見つかりません"
+        fi
+        
+        echo "✅ Capacitor公式ツールによるアイコン生成完了"
 
     # ========== 5. Android APKビルドフェーズ ==========
     - name: Build Android APK
