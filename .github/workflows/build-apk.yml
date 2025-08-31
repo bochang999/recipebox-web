@@ -52,6 +52,11 @@ jobs:
         npm install -g @capacitor/cli
         echo "✅ 依存関係インストール完了"
 
+    - name: Run Lint and Format Check
+      run: |
+        npm run lint
+        npm run format -- --check
+
     # ========== 3. ウェブアセット構築フェーズ ==========
     - name: Validate PWA Assets
       run: |
@@ -247,3 +252,9 @@ jobs:
         echo "- アーティファクト: RecipeBox-APK-${{ env.VERSION_TAG }}" >> $GITHUB_STEP_SUMMARY
         echo "" >> $GITHUB_STEP_SUMMARY
         echo "🚀 **RecipeBox APKビルドが正常に完了しました！**" >> $GITHUB_STEP_SUMMARY
+
+    - name: SonarCloud Scan
+      uses: SonarSource/sonarcloud-github-action@master
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}

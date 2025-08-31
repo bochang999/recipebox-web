@@ -16,8 +16,8 @@
     "android:build": "npm run capacitor:sync && cd android && ./gradlew assembleRelease",
     "android:sign": "cd android/app/build/outputs/apk/release && jarsigner -verbose -keystore ../../../../../template.keystore -signedjar app-release-signed.apk app-release-unsigned.apk template-key",
     "serve": "http-server -p 8080 -c-1 -o",
-    "lint": "echo 'Linting completed'",
-    "format": "echo 'Formatting completed'"
+    "format": "prettier --write \"**/*.{ts,js}\"",
+    "lint": "eslint \"**/*.{ts,js}\" --fix"
   },
   "repository": {
     "type": "git",
@@ -53,7 +53,13 @@
     "@capacitor/android": "^7.0.0",
     "@capacitor/cli": "^7.0.0",
     "@capacitor/status-bar": "^7.0.0",
+    "@typescript-eslint/eslint-plugin": "^8.41.0",
+    "@typescript-eslint/parser": "^8.41.0",
+    "eslint": "^9.34.0",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-import": "^2.32.0",
     "http-server": "^14.0.0",
+    "prettier": "^3.6.2",
     "typescript": "^5.9.2"
   },
   "engines": {
