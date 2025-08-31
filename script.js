@@ -1433,34 +1433,6 @@ class RecipeBoxApp {
                 versions: [
                     { version: '1.0', date: '2025-08-10', changes: '初版作成' }
                 ]
-            },
-            {
-                id: 'recipe_051',
-                name: '16cmのフライパンでつくるピザ生地',
-                category: 'main',
-                createdAt: '2025-08-10',
-                updatedAt: '2025-08-10',
-                servings: 1,
-                ingredients: [
-                    { name: '強力粉', amount: 80, unit: 'g' },
-                    { name: '水', amount: 50, unit: 'g' },
-                    { name: 'イースト菌', amount: 0.8, unit: 'g' },
-                    { name: 'オリーブオイル', amount: 1.6, unit: 'g' },
-                    { name: '砂糖', amount: 0.2, unit: 'g' },
-                    { name: '塩', amount: 2.1, unit: 'g' },
-                    { name: 'トマト缶', amount: 50, unit: 'g' }
-                ],
-                steps: [
-                    '材料を混ぜてこねる',
-                    '発酵させる',
-                    'フライパンサイズに伸ばす',
-                    'トマトソースを塗ってトッピングを乗せる',
-                    'フライパンで焼く'
-                ],
-                cookingTime: '30分（発酵含む）',
-                versions: [
-                    { version: '1.0', date: '2025-08-10', changes: '初版作成' }
-                ]
             }
         ];
     }
