@@ -102,20 +102,20 @@ jobs:
         echo "🔑 キーストア設定開始"
         
         if [ -z "${{ secrets.KEYSTORE_B64 }}" ]; then
-          echo "⚠️ GitHub Secrets未設定 - テンプレート用キーストア生成"
+          echo "⚠️ GitHub Secrets未設定 - RecipeBox固定キーストア生成"
           keytool -genkeypair -v \
             -keystore template-release.keystore \
-            -alias template-key \
+            -alias recipebox-release-key \
             -keyalg RSA \
             -keysize 2048 \
             -validity 10000 \
-            -dname "CN=PWA Template,OU=Template,O=Development,L=Tokyo,ST=Tokyo,C=JP" \
-            -storepass template123 \
-            -keypass template123
+            -dname "CN=RecipeBox,OU=RecipeBox,O=RecipeBox App,L=Tokyo,ST=Tokyo,C=JP" \
+            -storepass recipebox2024 \
+            -keypass recipebox2024
           
-          echo "KEYSTORE_PASSWORD=template123" >> $GITHUB_ENV
-          echo "KEY_ALIAS=template-key" >> $GITHUB_ENV
-          echo "KEY_PASSWORD=template123" >> $GITHUB_ENV
+          echo "KEYSTORE_PASSWORD=recipebox2024" >> $GITHUB_ENV
+          echo "KEY_ALIAS=recipebox-release-key" >> $GITHUB_ENV
+          echo "KEY_PASSWORD=recipebox2024" >> $GITHUB_ENV
         else
           echo "✅ GitHub Secrets設定済み - 本番キーストア使用"
           echo "${{ secrets.KEYSTORE_B64 }}" | base64 --decode > template-release.keystore
@@ -137,6 +137,29 @@ jobs:
         cp index.html style.css script.js manifest.json sw.js config.js dist/
         
         echo "✅ ウェブアセット準備完了"
+
+    - name: Generate Android App Icons
+      run: |
+        echo "🎨 Androidアプリアイコン生成開始"
+        
+        # Android mipmap directories作成
+        mkdir -p android/app/src/main/res/mipmap-{mdpi,hdpi,xhdpi,xxhdpi,xxxhdpi}
+        
+        # 提供されたアイコンから適切なサイズに変換
+        convert icons/icon-96x96.png -resize 48x48 android/app/src/main/res/mipmap-mdpi/ic_launcher.png
+        cp icons/icon-72x72.png android/app/src/main/res/mipmap-hdpi/ic_launcher.png
+        cp icons/icon-96x96.png android/app/src/main/res/mipmap-xhdpi/ic_launcher.png
+        cp icons/icon-144x144.png android/app/src/main/res/mipmap-xxhdpi/ic_launcher.png
+        cp icons/icon-192x192.png android/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png
+        
+        # Round icon variants (同じアイコンをコピー)
+        cp android/app/src/main/res/mipmap-mdpi/ic_launcher.png android/app/src/main/res/mipmap-mdpi/ic_launcher_round.png
+        cp android/app/src/main/res/mipmap-hdpi/ic_launcher.png android/app/src/main/res/mipmap-hdpi/ic_launcher_round.png
+        cp android/app/src/main/res/mipmap-xhdpi/ic_launcher.png android/app/src/main/res/mipmap-xhdpi/ic_launcher_round.png
+        cp android/app/src/main/res/mipmap-xxhdpi/ic_launcher.png android/app/src/main/res/mipmap-xxhdpi/ic_launcher_round.png
+        cp android/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png android/app/src/main/res/mipmap-xxxhdpi/ic_launcher_round.png
+        
+        echo "✅ アプリアイコン生成完了"
 
     - name: Initialize and Sync Capacitor Project
       run: |

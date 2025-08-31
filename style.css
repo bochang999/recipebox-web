@@ -10,6 +10,9 @@ body {
     background-color: #f5f5f5;
     color: #333;
     line-height: 1.6;
+    /* ステータスバーとの重なりを防ぐためのsafe-area対応 */
+    padding-top: env(safe-area-inset-top);
+    padding-bottom: env(safe-area-inset-bottom);
 }
 
 /* アプリ全体のコンテナ */
