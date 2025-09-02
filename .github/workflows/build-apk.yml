@@ -8,7 +8,7 @@ on:
   workflow_dispatch:
 
 env:
-  JAVA_VERSION: '17'
+  JAVA_VERSION: '21'
   NODE_VERSION: '20'
   
 jobs:
@@ -50,7 +50,16 @@ jobs:
         echo "📦 依存関係インストール開始"
         npm ci
         npm install -g @capacitor/cli
+        # CI環境でのみ@capacitor/assetsをインストール (Sharp依存関係がCI環境で利用可能)
+        npm install @capacitor/assets@^3.0.5
         echo "✅ 依存関係インストール完了"
+
+    - name: Run Lint and Format Check
+      env:
+        ESLINT_USE_FLAT_CONFIG: "false"
+      run: |
+        npm run lint
+        npm run format -- --check
 
     # ========== 3. ウェブアセット構築フェーズ ==========
     - name: Validate PWA Assets
@@ -94,24 +103,24 @@ jobs:
       run: |
         echo "🔑 キーストア設定開始"
         
-        if [ -z "${{ secrets.KEYSTORE_B64 }}" ]; then
-          echo "⚠️ GitHub Secrets未設定 - テンプレート用キーストア生成"
+        if [ -z "${{ secrets.KEYSTORE_FILE }}" ]; then
+          echo "⚠️ GitHub Secrets未設定 - RecipeBox固定キーストア生成"
           keytool -genkeypair -v \
             -keystore template-release.keystore \
-            -alias template-key \
+            -alias recipebox-release-key \
             -keyalg RSA \
             -keysize 2048 \
             -validity 10000 \
-            -dname "CN=PWA Template,OU=Template,O=Development,L=Tokyo,ST=Tokyo,C=JP" \
-            -storepass template123 \
-            -keypass template123
+            -dname "CN=RecipeBox,OU=RecipeBox,O=RecipeBox App,L=Tokyo,ST=Tokyo,C=JP" \
+            -storepass recipebox2024 \
+            -keypass recipebox2024
           
-          echo "KEYSTORE_PASSWORD=template123" >> $GITHUB_ENV
-          echo "KEY_ALIAS=template-key" >> $GITHUB_ENV
-          echo "KEY_PASSWORD=template123" >> $GITHUB_ENV
+          echo "KEYSTORE_PASSWORD=recipebox2024" >> $GITHUB_ENV
+          echo "KEY_ALIAS=recipebox-release-key" >> $GITHUB_ENV
+          echo "KEY_PASSWORD=recipebox2024" >> $GITHUB_ENV
         else
           echo "✅ GitHub Secrets設定済み - 本番キーストア使用"
-          echo "${{ secrets.KEYSTORE_B64 }}" | base64 --decode > template-release.keystore
+          echo "${{ secrets.KEYSTORE_FILE }}" | base64 --decode > template-release.keystore
           
           echo "KEYSTORE_PASSWORD=${{ secrets.KEYSTORE_PASSWORD }}" >> $GITHUB_ENV
           echo "KEY_ALIAS=${{ secrets.KEY_ALIAS }}" >> $GITHUB_ENV
@@ -129,12 +138,6 @@ jobs:
         mkdir -p dist
         cp index.html style.css script.js manifest.json sw.js config.js dist/
         
-        # 既存Androidディレクトリ削除（クリーンスタート）
-        if [ -d "android" ]; then
-          echo "🗑️ 既存Androidディレクトリを削除"
-          rm -rf android
-        fi
-        
         echo "✅ ウェブアセット準備完了"
 
     - name: Initialize and Sync Capacitor Project
@@ -142,6 +145,25 @@ jobs:
         echo "🔄 Capacitor同期開始"
         npx cap sync android
         echo "✅ Capacitor同期完了"
+
+    - name: Generate App Icons and Splash Screens (Capacitor Assets)
+      run: |
+        echo "🎨 Androidアダプティブアイコン生成開始 (Capacitor公式ツール)"
+        
+        # Capacitor公式アセットツールでアダプティブアイコン生成
+        npx @capacitor/assets generate --android
+        
+        # 生成結果確認
+        echo "✅ アダプティブアイコン生成完了! 生成ファイル:"
+        find android/app/src/main/res -name "*ic_launcher*" -o -name "*adaptive*" | sort
+        
+        # アダプティブアイコン仕様確認
+        if [ -d "android/app/src/main/res/mipmap-anydpi-v26" ]; then
+          echo "✅ Android 8.0+ アダプティブアイコン対応完了"
+          ls -la android/app/src/main/res/mipmap-anydpi-v26/
+        else
+          echo "⚠️ アダプティブアイコンディレクトリが生成されていません"
+        fi
 
     # ========== 5. Android APKビルドフェーズ ==========
     - name: Build Android APK
@@ -157,27 +179,30 @@ jobs:
         
         echo "✅ APK ビルド完了"
 
-    - name: Sign APK
+    - name: Sign APK with apksigner
+      id: sign_apk
       run: |
-        echo "✍️ APK署名開始"
+        echo "✍️ APK署名開始 (Modern apksigner)"
         
         cd android/app/build/outputs/apk/release
         
-        # APK署名
-        jarsigner -verbose \
-          -keystore ../../../../../template-release.keystore \
-          -storepass ${{ env.KEYSTORE_PASSWORD }} \
-          -keypass ${{ env.KEY_PASSWORD }} \
-          -signedjar app-release-signed.apk \
-          app-release-unsigned.apk \
-          ${{ env.KEY_ALIAS }}
+        # 最新のAndroid build-toolsのパスを取得
+        BUILD_TOOLS_PATH=$(ls -d $ANDROID_HOME/build-tools/* | sort -r | head -n 1)
+        echo "🔧 使用build-tools: $BUILD_TOOLS_PATH"
         
-        # zipalign実行
-        $ANDROID_HOME/build-tools/$(ls $ANDROID_HOME/build-tools | tail -1)/zipalign -v 4 \
-          app-release-signed.apk \
-          recipebox_${{ env.VERSION_TAG }}.apk
+        # APK署名 (signature scheme v2対応)
+        $BUILD_TOOLS_PATH/apksigner sign \
+          --ks ../../../../../../template-release.keystore \
+          --ks-key-alias ${{ env.KEY_ALIAS }} \
+          --ks-pass env:KEYSTORE_PASSWORD \
+          --key-pass env:KEY_PASSWORD \
+          --out recipebox_${{ env.VERSION_TAG }}.apk \
+          app-release-unsigned.apk
         
-        echo "🎯 署名完了: recipebox_${{ env.VERSION_TAG }}.apk"
+        # 署名検証
+        $BUILD_TOOLS_PATH/apksigner verify recipebox_${{ env.VERSION_TAG }}.apk
+        
+        echo "🎯 署名完了 (v2対応): recipebox_${{ env.VERSION_TAG }}.apk"
 
     - name: Verify APK
       run: |
@@ -253,3 +278,9 @@ jobs:
         echo "- アーティファクト: RecipeBox-APK-${{ env.VERSION_TAG }}" >> $GITHUB_STEP_SUMMARY
         echo "" >> $GITHUB_STEP_SUMMARY
         echo "🚀 **RecipeBox APKビルドが正常に完了しました！**" >> $GITHUB_STEP_SUMMARY
+
+    - name: SonarCloud Scan
+      uses: SonarSource/sonarcloud-github-action@master
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
