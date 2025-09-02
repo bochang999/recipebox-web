@@ -1,7 +1,8 @@
 {
-  "name": "recipebox-web",
-  "version": "2.16.0",
-  "description": "分量調整と塩分濃度計算ができるシンプルな料理レシピ管理アプリ",
+  "name": "petit-recipe",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "シンプルで使いやすいデジタルレシピ帳アプリ",
   "main": "index.html",
   "scripts": {
     "dev": "http-server -p 8080 -c-1",
@@ -21,7 +22,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/YOUR_USERNAME/pwa-to-apk-template.git"
+    "url": "https://github.com/bochang999/petit-recipe.git"
   },
   "keywords": [
     "pwa",
@@ -73,17 +74,17 @@
     "not ie 11"
   ],
   "pwa": {
-    "name": "RecipeBox",
-    "short_name": "RecipeBox",
-    "theme_color": "#2196F3",
+    "name": "PWA Template",
+    "short_name": "PWATemplate",
+    "theme_color": "#2C3E50",
     "background_color": "#FFFFFF",
     "start_url": "./",
     "display": "standalone",
     "orientation": "portrait"
   },
   "capacitor": {
-    "appId": "com.bochang.recipebox",
-    "appName": "RecipeBox",
+    "appId": "com.example.pwatemplate",
+    "appName": "PWA Template",
     "webDir": "./",
     "bundledWebRuntime": false
   }
